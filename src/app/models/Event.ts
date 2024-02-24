@@ -2,7 +2,8 @@
 export interface CaseEvent {
     name: string,
     description: string,
-    time: string
+    time: string,
+    bannerSrc: string
 }
 
 // FoodInfo represents a parsed response from the AI, evaluating the quality of food provided at the event

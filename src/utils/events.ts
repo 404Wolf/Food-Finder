@@ -4,6 +4,8 @@ import OpenAI from "openai";
 import nodeIcal from "node-ical";
 import { VEvent } from "node-ical";
 
+import { JSDOM } from "jsdom";
+
 const CWRU_ICAL_URL = "https://community.case.edu/ical/ical_cwru.ics";
 
 
@@ -15,6 +17,21 @@ function* iterateInChunks<T>(array: T[], chunkSize: number): Generator<T[]> {
         yield array.slice(i, i + chunkSize);
 }
 
+// Given an id for a case event (e.g. 2251998)
+async function fetchImageSrcForId(id: string): Promise<string | null> {
+    const url = `https://community.case.edu/rsvp?id=${id}`;
+
+    const html = await fetch(url).then(x => x.text());
+    const dom = new JSDOM(html);
+
+    const card = dom.window.document.querySelector(".rsvp__event-card");
+    if (card === null) return null;
+
+    const img = card.querySelector("img");
+    if (img === null) return null;
+
+    return img.src;
+}
 
 export const ical = {
     fetch: async (url: string): Promise<CaseEvent[]> => {
@@ -39,13 +56,18 @@ export const ical = {
             if (event.datetype == "date-time" && event.start && event.start < now)
                 continue;
 
-            // All events end with the the same string (with an id following it), so trim off the data
-            const description = event.description.split("\n---\nEvent Details: https://community.case.edu/rsvp?id=")[0];
+            // All events end with the the same string (with an id following it), so split the description from the id
+            const [description, id] = event.description.split("\n---\nEvent Details: https://community.case.edu/rsvp?id=")[0];
+
+            const bannerSrc = await fetchImageSrcForId(id);
+            if (!bannerSrc)
+                continue;
 
             caseEvents.push({
                 name: event.summary.val,
                 description,
                 time: event.start.toLocaleString(),
+                bannerSrc,
             });
         }
 
