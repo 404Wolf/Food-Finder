@@ -1,5 +1,4 @@
 import { MongoClient } from "mongodb";
-import dotenv from "dotenv";
 
 export async function mongoConnect() {
     const uri = process.env.MONGODB_URI;
@@ -11,5 +10,5 @@ export async function mongoConnect() {
     const client = new MongoClient(uri);
     await client.connect();
     const database = client.db("freefood");
-    return {db: database, client: client};
+    return { db: database, client: client };
 }

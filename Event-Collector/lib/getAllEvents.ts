@@ -1,6 +1,6 @@
 import { getAuthHeaders, getEventInfo } from "./puppetGetInfo";
 import nodeIcal, { VEvent } from "node-ical";
-import { CaseEvent, FoodInfo, Event } from "../Event"
+import { Event, Food, FoodEvent } from "../Event"
 import { analyzer } from "./getFoodInfo";
 import { uploadEvent } from "./uploadEvents";
 import dotenv from "dotenv";
@@ -34,13 +34,13 @@ export async function getEventIds() {
     return eventIds;
 }
 
-async function puppetToCaseEvent(event: PuppeteerEvent, caseID: string): Promise<CaseEvent> {
+async function puppetToCaseEvent(event: PuppeteerEvent, caseID: string): Promise<Event> {
     const name = event.name;
     const description = event.description;
     const time = event.startDate;
     const bannerSrc = event.image;
 
-    const caseEvent: CaseEvent = {
+    const caseEvent: Event = {
         name,
         description,
         time,
@@ -59,11 +59,11 @@ export async function getAllEvents() {
         const data = await getEventInfo(id, authHeaders);
         const caseEvent = await puppetToCaseEvent(data, id);
         const foodInfo = await analyzer.analyze(caseEvent.description);
-        const event: Event = {
-            foodInfo,
+        const event: FoodEvent = {
+            food: foodInfo,
             event: caseEvent,
         }
-        if (event.foodInfo.rating > 0) {console.log(event)}
+        if (event.food.rating > 0) {console.log(event)}
         events.push(event);
         uploadEvent(event);
     }

@@ -1,11 +1,7 @@
 import OpenAI from "openai";
-import { FoodInfo } from "../Event";
-import dotenv from "dotenv";
+import { Food } from "../Event";
 
-const openai_key = dotenv.config().parsed.OPENAI_KEY;
-const openai = new OpenAI({
-  apiKey: openai_key,
-});
+const openai = new OpenAI();
 
 function extractLastNumber(str) {
     const matches = str.match(/\d+/g); // Match all numbers in the string
@@ -36,7 +32,7 @@ export const analyzer = {
 
     console.log(completion.choices[0]);
 
-    const foodInfo: FoodInfo = {
+    const foodInfo: Food = {
       rating: extractLastNumber(completion.choices[0].message.content),
       description: "placeholder",
       cuisine: "placeholder",
