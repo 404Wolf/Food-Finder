@@ -12,14 +12,14 @@ export interface PuppeteerEvent {
         name: string;
         address: string;
     };
-    image: string;
+    image: string[];
     description: string;
 }
 
 const URL = "https://community.case.edu/brewcwru/rsvp_boot?id=2254804";
 
 export async function getAuthHeaders(caseId: string, casePassword: string) {
-    const browser = await puppeteer.launch({ headless: false });
+    const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
 
     await page.goto("https://login.case.edu/cas/login");
@@ -33,20 +33,21 @@ export async function getAuthHeaders(caseId: string, casePassword: string) {
 
     const cookies = await page.cookies();
     const headers = {
-        Cookie: cookies.map((ck) => `${ck.name}=${ck.value}`).join("; "),
+        'Cookie': cookies.map((ck) => `${ck.name}=${ck.value}`).join("; "),
     };
     await browser.close();
 
     return headers;
 }
 
-export async function getEventInfo(eventId, headers): Promise<PuppeteerEvent> {
+export async function getEventInfo(eventId: string, headers): Promise<PuppeteerEvent> {
     const eventText = await fetch(`https://community.case.edu/brewcwru/rsvp_boot?id=${eventId}`, {
         headers: headers,
         referrerPolicy: "strict-origin-when-cross-origin",
         body: null,
         method: "GET",
     }).then((response) => response.text());
+
     const dom = new jsdom.JSDOM(eventText);
     const data = dom.window.document.querySelector("#page-cont > script:nth-child(4)").innerHTML;
 

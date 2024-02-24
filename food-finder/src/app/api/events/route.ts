@@ -11,7 +11,8 @@ export const GET = async (): Promise<Response> => {
     events = events
         .filter((event) => event !== undefined)
         .filter((event) => {
-            return event.food.rating > 0 && event.event.date > new Date();
+            return event.food.rating > 0 
+            // && event.date > new Date();
         });
     client.close();
 

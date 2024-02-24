@@ -6,5 +6,5 @@ export default async function getExistingEvents() {
     const collection = db.collection("events");
     const events = await collection.find({}, { projection: { _id: 1 } }).toArray();
     client.close();
-    return events as any as string[];
+    return events;
 }

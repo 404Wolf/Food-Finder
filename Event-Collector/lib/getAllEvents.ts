@@ -5,12 +5,10 @@ import { analyzer } from "./getFoodInfo";
 import { uploadEvent } from "./uploadEvents";
 import { PuppeteerEvent } from "./puppetGetInfo";
 import getExistingEvents from "./getExistingEvents";
-import { ObjectId } from "mongodb";
 
 const CWRU_ICAL_URL = "https://community.case.edu/ical/ical_cwru.ics";
 const CASE_ID = process.env.CASE_ID;
 const CASE_PASSWORD = process.env.CASE_PASSWORD;
-const authHeaders = getAuthHeaders(CASE_ID, CASE_PASSWORD);
 
 export async function getEventIds() {
     const eventIds: string[] = [];
@@ -21,6 +19,16 @@ export async function getEventIds() {
         if (key === "vcalendar") continue;
 
         const event = events[key] as VEvent;
+
+        const date = new Date(event.start);
+
+        const now = new Date();
+
+        // If the event has already passed, don't bother analyzing it
+        if (event.start < now) {
+            console.debug(`Skipping event ${event.location} because it has already passed`);
+            continue;
+        }
 
         if (!event.description || !event.summary) continue;
 
@@ -39,34 +47,49 @@ async function puppetToCaseEvent(event: PuppeteerEvent, eventId: string): Promis
     const description = event.description;
     const time = event.startDate;
     const bannerSrc = event.image;
+    const location = event.location;
 
     const eventInfo: Event = {
-        _id: new ObjectId(eventId),
-        name,
+        _id: Number.parseInt(eventId),
+        name: name,
         description,
         date: new Date(time),
-        bannerSrc,
+        bannerSrc:
+            bannerSrc && bannerSrc.length && bannerSrc.length > 0 ? bannerSrc[0] : "about:blank",
+        location,
     };
     return eventInfo;
 }
 
 export async function getAllEvents() {
-    const existingEventIds = new Set(await getExistingEvents());
+    const authHeaders = await getAuthHeaders(CASE_ID, CASE_PASSWORD);
+
+    const dbEvents = await getExistingEvents();
+    const existingEventIds = new Set(dbEvents.map((x) => x._id.toString()));
     const eventIds = await getEventIds();
     const events = [];
 
+    const now = new Date();
+
     for (const id of eventIds) {
         if (existingEventIds.has(id)) {
-            console.debug("Skipping event " + id);
+            console.debug(`Skipping event ${id}`);
             continue;
         }
 
         const data = await getEventInfo(id, authHeaders);
         const eventInfo = await puppetToCaseEvent(data, id);
+
+        // If the event has already passed, don't bother analyzing it
+        if (eventInfo.date < now) {
+            console.debug(`Skipping event ${id} because it has already passed`);
+            continue;
+        }
+
         const foodInfo = await analyzer.analyze(eventInfo.description);
         const event: FoodEvent = {
             food: foodInfo,
-            event: eventInfo,
+            ...eventInfo,
             fetchedAt: new Date(),
         };
         if (event.food.rating > 0) {

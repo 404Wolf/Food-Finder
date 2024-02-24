@@ -1,11 +1,12 @@
 import Image from "next/image";
 import EventCard from "../components/EventCard";
-import Events from "../components/Events";
+import { EventsArea } from "@/components/EventsArea";
+import { Container } from "@mui/material";
 
 export default async function Home() {
     return (
-        <div>
-            <Events />
-        </div>
+        <Container>
+            <EventsArea />
+        </Container>
     );
 }
