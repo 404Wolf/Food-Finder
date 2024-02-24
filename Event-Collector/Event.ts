@@ -1,6 +1,8 @@
+import { ObjectId } from "mongodb";
+
 // CaseEvent represents a parsed event loaded from the iCal
 export interface Event {
-    _id: string,  // "1234567890"
+    _id: ObjectId,  // "1234567890"
     name: string, // "Case for a Cause"
     description: string, // "A charity event to raise money for the homeless"
     date: Date, // "2021-04-20T12:00:00Z" 

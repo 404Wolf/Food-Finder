@@ -3,8 +3,6 @@ const puppeteer = require('puppeteer');
 
 
 const URL = "https://community.case.edu/brewcwru/rsvp_boot?id=2254804";
-const CASE_ID = "wsm32";
-const CASE_PASSWORD = "#vq!r5PmbhE8&Wg%TASJzDZK";
 
 
 export async function getAuthHeaders(caseId, casePassword) {

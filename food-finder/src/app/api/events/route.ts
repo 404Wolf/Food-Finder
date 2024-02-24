@@ -5,6 +5,8 @@ export const GET = async (): Promise<Response> => {
     const { db, client } = await mongoConnect();
     const collection = db.collection("events");
     const temp: any = await collection.find({}).toArray();
+    console.log(temp);
+    
     let events = temp as FoodEvent[];
     events = events
         .filter((event) => event !== undefined)

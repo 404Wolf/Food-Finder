@@ -5,6 +5,7 @@ import { analyzer } from "./getFoodInfo";
 import { uploadEvent } from "./uploadEvents";
 import { PuppeteerEvent } from "./puppetGetInfo";
 import getExistingEvents from "./getExistingEvents";
+import { ObjectId } from "mongodb";
 
 const CWRU_ICAL_URL = "https://community.case.edu/ical/ical_cwru.ics";
 const CASE_ID = process.env.CASE_ID;
@@ -40,7 +41,7 @@ async function puppetToCaseEvent(event: PuppeteerEvent, eventId: string): Promis
     const bannerSrc = event.image;
 
     const eventInfo: Event = {
-        _id: eventId,
+        _id: new ObjectId(eventId),
         name,
         description,
         date: new Date(time),
