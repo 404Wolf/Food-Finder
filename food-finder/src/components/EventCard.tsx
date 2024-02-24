@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import Event from "@/app/models/Event";
 import { Card, CardContent, Typography, CardMedia } from "@mui/material";
 import { styled } from "@mui/material/styles";
 

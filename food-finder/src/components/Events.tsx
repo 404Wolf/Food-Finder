@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import EventCard from "@/components/EventCard";
-import type Event from "@/app/models/Event";
 
 export default function Events() {
     const [events, setEvents] = useState<Event[]>([]);

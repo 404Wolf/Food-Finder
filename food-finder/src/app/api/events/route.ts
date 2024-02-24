@@ -1,4 +1,3 @@
-import Event from "@/app/models/Event";
 import { mongoConnect } from "@/utils/mongoConnect";
 
 export const GET = async (): Promise<Response> => {
