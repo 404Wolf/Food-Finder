@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import EventCard from "@/components/EventCard";
-import { FoodEvent } from "@/../../event-collector/Event";
+import { FoodEvent } from "@/models/Event";
 
 export default function Events() {
     const [events, setEvents] = useState<FoodEvent[]>([]);
@@ -14,7 +14,8 @@ export default function Events() {
             .then((data) => {
                 setEvents(data.data);
                 setLoading(false);
-            });
+            })
+            .catch((err) => console.error(err));
     }, []);
 
     if (loading) {
@@ -25,9 +26,11 @@ export default function Events() {
 
     return (
         <div>
-            {events.map((event, i) => (
-                <EventCard event={event} key={i} />
-            ))}
+            {events
+                .filter((event) => event !== undefined)
+                .map((event, i) => (
+                    <EventCard event={event} key={i} />
+                ))}
         </div>
     );
 }
