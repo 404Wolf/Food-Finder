@@ -2,40 +2,44 @@
 
 import React from "react";
 import Event from "@/app/models/Event";
-import { Card, CardContent, Typography } from "@mui/material";
+import { Card, CardContent, Typography, CardMedia } from "@mui/material";
+import { styled } from "@mui/material/styles";
+
+const StyledCard = styled(Card)(({ theme }) => ({
+  backgroundColor: "rgb(15 23 42)",
+  margin: "20px",
+  color: "white",
+}));
 
 export default function EventCard(props: { event: Event }) {
-    const { event: caseEvent, foodInfo }: Event = props.event;
+  const { event: caseEvent, foodInfo }: Event = props.event;
 
-    // const dateString = caseEvent.time;
-    // console.log(dateString);
-    // const formattedDate = `${dateString.slice(0, 4)}-${dateString.slice(4, 6)}-${dateString.slice(
-    //     6,
-    //     8
-    // )}T${dateString.slice(9, 11)}:${dateString.slice(11, 13)}:${dateString.slice(13, 15)}`;
-    // const date = new Date(formattedDate);
-    // const datetimeStr = date.toLocaleDateString() + " " + date.toLocaleTimeString();
-
-    // console.log(date);
-
-    return (
-        <Card>
-            <CardContent>
-                <Typography variant="h5" component="h2">
-                    {caseEvent.name}
-                </Typography>
-                <Typography color="textSecondary">{caseEvent.time}</Typography>
-                <Typography variant="body2" component="p">
-                    {caseEvent.description}
-                </Typography>
-                <Typography variant="subtitle1" gutterBottom>
-                    Food Information:
-                </Typography>
-                <Typography>Rating: {foodInfo.rating}/10</Typography>
-                <Typography>Description: {foodInfo.description}</Typography>
-                <Typography>Cuisine: {foodInfo.cuisine}</Typography>
-                <Typography>Volunteer: {foodInfo.volunteer ? "Yes" : "No"}</Typography>
-            </CardContent>
-        </Card>
-    );
+  return (
+    <StyledCard className="m-20">
+      <CardContent>
+        <Typography variant="h5" component="h2">
+          {caseEvent.name}
+        </Typography>
+        <Typography color="subtitle1">{caseEvent.time}</Typography>
+        <Typography variant="body2" component="p">
+          {caseEvent.description}
+        </Typography>
+        <CardMedia
+          component="img"
+          sx={{
+            width: "100%",
+            borderRadius: "10px",
+            marginTop: "2rem",
+            marginBottom: "2rem",
+          }}
+          image={caseEvent.bannerSrc[0]}
+          alt={caseEvent.name}
+        />
+        <Typography>Food Rating: {foodInfo.rating}/10</Typography>
+        <Typography>Description: {foodInfo.description}</Typography>
+        <Typography>Cuisine: {foodInfo.cuisine}</Typography>
+        <Typography>Volunteer: {foodInfo.volunteer ? "Yes" : "No"}</Typography>
+      </CardContent>
+    </StyledCard>
+  );
 }
