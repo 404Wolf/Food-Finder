@@ -5,7 +5,6 @@ export interface Event {
     description: string, // "A charity event to raise money for the homeless"
     date: Date, // "2021-04-20T12:00:00Z" 
     bannerSrc: string, // "https://www.example.com/banner.jpg"
-    fetchedAt: Date, // "2021-04-20T12:00:00Z"
 }
 
 // FoodInfo represents a parsed response from the AI, evaluating the quality of food provided at the event
@@ -20,4 +19,5 @@ export interface Food {
 export interface FoodEvent {
     food: Food,
     event: Event
+    fetchedAt: Date, // "2021-04-20T12:00:00Z"
 }
