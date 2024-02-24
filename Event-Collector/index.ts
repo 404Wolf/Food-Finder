@@ -1,3 +1,3 @@
-// import { getAllEvents, getEventIds } from './lib/getAllEvents';
+import { getAllEvents, getEventIds } from './lib/getAllEvents';
 
-// getAllEvents();
+getAllEvents();

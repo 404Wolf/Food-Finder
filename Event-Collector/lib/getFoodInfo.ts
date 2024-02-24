@@ -31,7 +31,7 @@ export const analyzer = {
         { role: "assistant", content: prompt },
         { role: "user", content: description },
       ],
-      model: "gpt-3.5-turbo",
+      model: "gpt-3.5-turbo-0125",
     });
 
     console.log(completion.choices[0]);
