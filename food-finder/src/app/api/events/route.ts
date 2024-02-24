@@ -1,5 +1,5 @@
 import { mongoConnect } from "@/utils/mongoConnect";
-import { FoodEvent } from "../../../../../event-collector/Event";
+import { FoodEvent } from "@/../../event-collector/Event";
 
 export const GET = async (): Promise<Response> => {
     const { db, client } = await mongoConnect();

@@ -3,7 +3,7 @@
 import React from "react";
 import { Card, CardContent, Typography, CardMedia } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import type { FoodEvent } from "../../../event-collector/Event";
+import type { FoodEvent } from "@/../../event-collector/Event";
 
 const StyledCard = styled(Card)(({ theme }) => ({
     width: "70%",
