@@ -45,7 +45,6 @@ async function puppetToCaseEvent(event: PuppeteerEvent, eventId: string): Promis
         description,
         date: new Date(time),
         bannerSrc,
-        fetchedAt: new Date(),
     };
     return eventInfo;
 }
@@ -67,6 +66,7 @@ export async function getAllEvents() {
         const event: FoodEvent = {
             food: foodInfo,
             event: eventInfo,
+            fetchedAt: new Date(),
         };
         if (event.food.rating > 0) {
             console.debug(event);

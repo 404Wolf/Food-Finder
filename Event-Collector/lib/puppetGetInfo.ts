@@ -1,34 +1,30 @@
-const jsdom = require('jsdom');
-const puppeteer = require('puppeteer');
+const jsdom = require("jsdom");
+const puppeteer = require("puppeteer");
 
 export interface PuppeteerEvent {
-    "@context": string,
-    "@type": string,
-    "name": string,
-    "startDate": string,
-    "endDate": string,
-    "location": {
-        "@type": string,
-        "name": string,
-        "address": string,
-    },
-    "image": string,
-    "description": string,
+    "@context": string;
+    "@type": string;
+    name: string;
+    startDate: string;
+    endDate: string;
+    location: {
+        "@type": string;
+        name: string;
+        address: string;
+    };
+    image: string;
+    description: string;
 }
 
-
 const URL = "https://community.case.edu/brewcwru/rsvp_boot?id=2254804";
-const CASE_ID = "wsm32";
-const CASE_PASSWORD = "#vq!r5PmbhE8&Wg%TASJzDZK";
-
 
 export async function getAuthHeaders(caseId: string, casePassword: string) {
     const browser = await puppeteer.launch({ headless: false });
     const page = await browser.newPage();
 
     await page.goto("https://login.case.edu/cas/login");
-    await page.type('#username', caseId);
-    await page.type('#password', casePassword);
+    await page.type("#username", caseId);
+    await page.type("#password", casePassword);
     await page.click('input[name="submit"]');
 
     await page.goto("https://www.campusgroups.com/shibboleth/login?idp=cwru");
@@ -37,7 +33,7 @@ export async function getAuthHeaders(caseId: string, casePassword: string) {
 
     const cookies = await page.cookies();
     const headers = {
-        'Cookie': cookies.map(ck => `${ck.name}=${ck.value}`).join('; ')
+        Cookie: cookies.map((ck) => `${ck.name}=${ck.value}`).join("; "),
     };
     await browser.close();
 
@@ -46,23 +42,13 @@ export async function getAuthHeaders(caseId: string, casePassword: string) {
 
 export async function getEventInfo(eventId, headers): Promise<PuppeteerEvent> {
     const eventText = await fetch(`https://community.case.edu/brewcwru/rsvp_boot?id=${eventId}`, {
-        "headers": headers,
-        "referrerPolicy": "strict-origin-when-cross-origin",
-        "body": null,
-        "method": "GET"
-    }).then(response => response.text());
+        headers: headers,
+        referrerPolicy: "strict-origin-when-cross-origin",
+        body: null,
+        method: "GET",
+    }).then((response) => response.text());
     const dom = new jsdom.JSDOM(eventText);
-    const data = dom.window.document.querySelector("#page-cont > script:nth-child(4)").innerHTML
+    const data = dom.window.document.querySelector("#page-cont > script:nth-child(4)").innerHTML;
 
     return JSON.parse(data);
 }
-
-// async function main() {
-//     const authHeaders = await getAuthHeaders(CASE_ID, CASE_PASSWORD);
-
-//     console.log(
-//        await getEventInfo(2254804, authHeaders)
-//     );
-// }
-
-// main();
