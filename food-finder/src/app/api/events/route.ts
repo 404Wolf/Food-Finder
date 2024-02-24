@@ -6,9 +6,11 @@ export const GET = async (): Promise<Response> => {
     const collection = db.collection("events");
     const temp: any = await collection.find({}).toArray();
     let events = temp as FoodEvent[];
-    events = events.filter((event) => {
-        return event.food.rating > 0 && event.event.date > new Date();
-    });
+    events = events
+        .filter((event) => event !== undefined)
+        .filter((event) => {
+            return event.food.rating > 0 && event.event.date > new Date();
+        });
     client.close();
 
     return Response.json({ success: true, data: events });
