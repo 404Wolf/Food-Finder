@@ -50,6 +50,7 @@ export default function EventCard(props: { event: Event }) {
               component="img"
               sx={{
                 width: "50%",
+                height: "100%",
                 borderRadius: "10px",
                 marginTop: "2rem",
                 marginBottom: "2rem",
