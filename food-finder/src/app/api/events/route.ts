@@ -1,16 +1,15 @@
 import { mongoConnect } from "@/utils/mongoConnect";
+import { FoodEvent } from "../../../../../event-collector/Event";
 
 export const GET = async (): Promise<Response> => {
-  const { db, client } = await mongoConnect();
-  const collection = db.collection("events");
-  const temp: any = await collection.find({}).toArray();
-  let events = temp as Event[];
-  events = events.filter((event) => {
-    return event.foodInfo.rating > 0 
-    // && new Date(event.event.time) > new Date(); 
-    // Uncomment to only show future events
-  });
-  client.close();
+    const { db, client } = await mongoConnect();
+    const collection = db.collection("events");
+    const temp: any = await collection.find({}).toArray();
+    let events = temp as FoodEvent[];
+    events = events.filter((event) => {
+        return event.food.rating > 0 && event.event.date > new Date();
+    });
+    client.close();
 
-  return Response.json({ success: true, data: events });
+    return Response.json({ success: true, data: events });
 };

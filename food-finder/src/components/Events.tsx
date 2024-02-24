@@ -2,9 +2,10 @@
 
 import { useState, useEffect } from "react";
 import EventCard from "@/components/EventCard";
+import { FoodEvent } from "../../../event-collector/Event";
 
 export default function Events() {
-    const [events, setEvents] = useState<Event[]>([]);
+    const [events, setEvents] = useState<FoodEvent[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
