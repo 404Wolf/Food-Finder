@@ -4,7 +4,6 @@ import React from "react";
 import Event from "@/app/models/Event";
 import { Card, CardContent, Typography, CardMedia } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { Link, Link as RouterLink } from "react-router-dom";
 
 const StyledCard = styled(Card)(({ theme }) => ({
   width: "70%",
@@ -31,7 +30,7 @@ export default function EventCard(props: { event: Event }) {
     minute: "2-digit",
   });
 
-  const url = `https://community.case.edu/rsvp?id=${caseEvent.caseID}`;
+  const url = `https://community.case.edu/rsvp?id=${caseEvent._id}`;
 
   return (
     <div className="flex justify-center items-center justify-items-center">

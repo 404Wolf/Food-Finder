@@ -1,10 +1,10 @@
 // CaseEvent represents a parsed event loaded from the iCal
 export interface CaseEvent {
+    _id: number,
     name: string,
     description: string,
     time: string,
     bannerSrc: string,
-    caseID: string,
 }
 
 // FoodInfo represents a parsed response from the AI, evaluating the quality of food provided at the event

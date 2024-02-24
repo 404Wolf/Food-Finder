@@ -1,7 +1,7 @@
 import { mongoConnect } from "./mongoConnect";
 import { FoodEvent } from "../Event";
 
-export default async function uploadEvent(event: FoodEvent) {
+export async function uploadEvent(event: FoodEvent) {
     const { db, client } = await mongoConnect();
     const collection = db.collection("events");
     await collection.insertOne(event);
