@@ -7,7 +7,9 @@ export const GET = async (): Promise<Response> => {
   const temp: any = await collection.find({}).toArray();
   let events = temp as Event[];
   events = events.filter((event) => {
-    return event.foodInfo.rating > 0;
+    return event.foodInfo.rating > 0 
+    // && new Date(event.event.time) > new Date(); 
+    // Uncomment to only show future events
   });
   client.close();
 
