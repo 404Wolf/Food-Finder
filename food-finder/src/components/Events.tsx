@@ -12,7 +12,11 @@ export default function Events() {
         fetch("/api/events")
             .then((res) => res.json())
             .then((data) => {
-                setEvents(data.data);
+                setEvents(
+                    data.data.filter(
+                        (eventInfo: FoodEvent) => eventInfo !== undefined
+                    ) as FoodEvent[]
+                );
                 setLoading(false);
             })
             .catch((err) => console.error(err));
