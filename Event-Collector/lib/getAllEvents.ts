@@ -1,5 +1,7 @@
 import { getAuthHeaders, getEventInfo } from "./puppetGetInfo";
 import nodeIcal, { VEvent } from "node-ical";
+import pLimit from "p-limit";
+
 import { Event, Food, FoodEvent } from "../Event";
 import { analyzer } from "./getFoodInfo";
 import { uploadEvent } from "./uploadEvents";
@@ -61,32 +63,36 @@ async function puppetToCaseEvent(event: PuppeteerEvent, eventId: string): Promis
     return eventInfo;
 }
 
-export async function getAllEvents() {
+export async function getAndStoreAllEvents() {
     const authHeaders = await getAuthHeaders(CASE_ID, CASE_PASSWORD);
 
     const dbEvents = await getExistingEvents();
     const existingEventIds = new Set(dbEvents.map((x) => x._id.toString()));
     const eventIds = await getEventIds();
-    const events = [];
 
     const now = new Date();
+    const limit = pLimit(10);
 
-    for (const id of eventIds) {
+    async function getAndUploadEvent(id: string) {
         if (existingEventIds.has(id)) {
             console.debug(`Skipping event ${id}`);
-            continue;
+            return;
         }
 
         const data = await getEventInfo(id, authHeaders);
+        if (!data) return;
+
         const eventInfo = await puppetToCaseEvent(data, id);
 
         // If the event has already passed, don't bother analyzing it
         if (eventInfo.date < now) {
             console.debug(`Skipping event ${id} because it has already passed`);
-            continue;
+            return;
         }
 
         const foodInfo = await analyzer.analyze(eventInfo.description);
+        if (!foodInfo) return;
+
         const event: FoodEvent = {
             food: foodInfo,
             ...eventInfo,
@@ -95,10 +101,25 @@ export async function getAllEvents() {
         if (event.food.rating > 0) {
             console.debug(event);
         }
-        events.push(event);
+
         uploadEvent(event);
     }
 
-    console.debug("Fetches events:\n" + JSON.stringify(events));
-    return events;
+    const timeout = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+    const withTimeout = async (promise, timeoutMs) => {
+        return Promise.race([promise, timeout(timeoutMs)]);
+    };
+
+    await Promise.all(eventIds.map(
+        id => withTimeout(limit(async () => await getAndUploadEvent(id)), 60000)
+    ));
+
+    // const events = await Promise.all(eventIds.map(
+    //     id => limit(async () => await getEvent(id))
+    // ));
+
+    // uploadEvents(events);
+
+    // console.debug(`Fetched events:\n${JSON.stringify(events)}`);
 }

@@ -1,5 +1,5 @@
-const jsdom = require("jsdom");
-const puppeteer = require("puppeteer");
+import puppeteer from "puppeteer";
+import { JSDOM } from "jsdom";
 
 export interface PuppeteerEvent {
     "@context": string;
@@ -40,7 +40,7 @@ export async function getAuthHeaders(caseId: string, casePassword: string) {
     return headers;
 }
 
-export async function getEventInfo(eventId: string, headers): Promise<PuppeteerEvent> {
+export async function getEventInfo(eventId: string, headers): Promise<PuppeteerEvent | null> {
     const eventText = await fetch(`https://community.case.edu/brewcwru/rsvp_boot?id=${eventId}`, {
         headers: headers,
         referrerPolicy: "strict-origin-when-cross-origin",
@@ -48,8 +48,14 @@ export async function getEventInfo(eventId: string, headers): Promise<PuppeteerE
         method: "GET",
     }).then((response) => response.text());
 
-    const dom = new jsdom.JSDOM(eventText);
-    const data = dom.window.document.querySelector("#page-cont > script:nth-child(4)").innerHTML;
+    const dom = new JSDOM(eventText);
+    const element = dom.window.document.querySelector("#page-cont > script:nth-child(4)");
 
-    return JSON.parse(data);
+    // In the event we could not fetch the element, ignore this event
+    try {
+        return JSON.parse(element.innerHTML);
+    } catch {
+        console.debug(`Failed to fetch and parse event id ${eventId}`);
+        return null;
+    }
 }

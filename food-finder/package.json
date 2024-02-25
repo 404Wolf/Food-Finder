@@ -19,6 +19,7 @@
     "node-ical": "^0.17.2",
     "node-ts": "^6.0.1",
     "openai": "^4.28.0",
+    "p-limit": "^5.0.0",
     "react": "^18",
     "react-dom": "^18"
   },

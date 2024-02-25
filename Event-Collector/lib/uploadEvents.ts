@@ -8,9 +8,9 @@ export async function uploadEvent(event: FoodEvent) {
     client.close();
 }
 
-export async function uploadEvents(events: FoodEvent[]) {
-    const { db, client } = await mongoConnect();
-    const collection = db.collection("events");
-    await collection.insertMany(events as any);
-    client.close();
-}
+// export async function uploadEvents(events: FoodEvent[]) {
+//     const { db, client } = await mongoConnect();
+//     const collection = db.collection("events");
+//     await collection.insertMany(events as any);
+//     client.close();
+// }

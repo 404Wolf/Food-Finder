@@ -1,4 +1,3 @@
-import { getAllEvents, getEventIds } from "./lib/getAllEvents";
-import dotEnv from "dotenv";
+import { getAndStoreAllEvents } from "./lib/getAllEvents";
 
-getAllEvents();
+getAndStoreAllEvents();
