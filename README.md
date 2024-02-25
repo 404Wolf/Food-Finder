@@ -1,4 +1,5 @@
 # Food Finder
+## Authored by Wolf Mermelstein, Eric, and Mark
 
 Have you ever wanted to HAVE FOOOOOOD!???
 
