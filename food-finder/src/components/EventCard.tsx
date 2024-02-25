@@ -1,24 +1,35 @@
 "use client";
 
 import React, { useState } from "react";
-import { Card, CardContent, Typography, CardMedia } from "@mui/material";
+import { Card, CardContent, Typography, CardMedia, Rating, Collapse, Chip } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { FoodEvent } from "@/models/Event";
+import DatePicker from "@mui/lab/DatePicker";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 
 const StyledCard = styled(Card)(({ theme }) => ({
-    width: "70%",
-    backgroundColor: "rgb(15 23 42)",
-    color: "white",
+    height: "100%",
+    width: "100%",
+    borderRadius: "10px",
 }));
 
+function truncateString(input: string, charsToKeep: number): string {
+    if (input.length <= charsToKeep) {
+        return input;
+    }
+
+    let truncatedString = input.substr(0, charsToKeep);
+    const lastSpaceIndex = truncatedString.lastIndexOf(" ");
+
+    if (lastSpaceIndex !== -1) {
+        truncatedString = truncatedString.substr(0, lastSpaceIndex);
+    }
+
+    return truncatedString + "...";
+}
+
 export default function EventCard(props: { eventInfo: FoodEvent }) {
-    const [expanded, setExpanded] = useState(false);
-
-    const handleExpandClick = () => {
-        setExpanded(!expanded);
-    };
-
     const date = new Date(props.eventInfo.date);
     const niceDate = date.toLocaleDateString("en-US", {
         weekday: "long",
@@ -32,53 +43,61 @@ export default function EventCard(props: { eventInfo: FoodEvent }) {
     const url = `https://community.case.edu/rsvp?id=${props.eventInfo._id}`;
 
     return (
-        <div className="flex justify-center items-center justify-items-center relative">
-            <StyledCard className="flex m-5">
-                <a href={url} target="_blank" rel="noopener noreferrer" className="grow">
-                    <CardContent>
-                        <div>
-                            <Typography>Food Rating: {props.eventInfo.food.rating}/10</Typography>
+        <div className="flex justify-stretch justify-items-center relative h-full">
+            <StyledCard className="flex-col h-[12rem] pb-[10px]">
+                <div className="relative h-full p-2">
+                    <Typography variant="h6" className="text-center rounded-lg">
+                        {truncateString(props.eventInfo.name, 50)}
 
-                            <Typography>
-                                Description: {props.eventInfo.food.description}
-                            </Typography>
+                        <Typography>
+                            ({props.eventInfo.food.cuisine.replaceAll('"', "")})
+                        </Typography>
+                    </Typography>
 
-                            <Typography>Cuisine: {props.eventInfo.food.cuisine}</Typography>
+                    <div className="mt-5"></div>
 
-                            <Typography>
-                                Volunteer: {props.eventInfo.food.volunteer ? "Yes" : "No"}
-                            </Typography>
-                        </div>
-
-                        {expanded && (
-                            <div>
-                                <Typography variant="h5" component="h2">
-                                    {props.eventInfo.name}
-                                </Typography>
-
-                                <Typography color="subtitle1">{niceDate}</Typography>
-
-                                <Typography variant="body2" component="p">
-                                    {props.eventInfo.description}
-                                </Typography>
-
-                                <Typography>Location: {props.eventInfo.location.name}</Typography>
+                    <a href={url} target="_blank" rel="noopener noreferrer" className="basis-3/5">
+                        <CardContent>
+                            <div className="float-right">
+                                <CardMedia
+                                    className="rounded-md max-h-20 max-w-40 ml-3 mb-3 border-2 border-gray-300"
+                                    component="img"
+                                    image={props.eventInfo.bannerSrc}
+                                    alt={props.eventInfo.name}
+                                />
                             </div>
-                        )}
-                    </CardContent>
-                </a>
 
-                <div className="max-h-20 m-5">
-                    <CardMedia
-                        component="img"
-                        sx={{
-                            width: "30%",
-                            height: "100%",
-                            borderRadius: "10px",
-                        }}
-                        image={props.eventInfo.bannerSrc}
-                        alt={props.eventInfo.name}
-                    />
+                            <div className="-mb-4">
+                                <Rating
+                                    name="simple-controlled"
+                                    value={props.eventInfo.food.rating / 2}
+                                    precision={0.5}
+                                    readOnly
+                                />
+
+                                <Typography>
+                                    {truncateString(props.eventInfo.food.description, 200)}
+                                </Typography>
+
+                                <div className="flex gap-1 -ml-1 mt-1">
+                                    {props.eventInfo.food.volunteer as any as string === "true" && (
+                                        <Chip
+                                            label="Volunteer"
+                                            variant="outlined"
+                                            className="scale-90"
+                                            size="small"
+                                        />
+                                    )}
+                                    <Chip
+                                        label="Free"
+                                        variant="outlined"
+                                        className="scale-90"
+                                        size="small"
+                                    />
+                                </div>
+                            </div>
+                        </CardContent>
+                    </a>
                 </div>
             </StyledCard>
         </div>

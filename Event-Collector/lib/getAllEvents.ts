@@ -6,6 +6,8 @@ import { uploadEvent } from "./uploadEvents";
 import { PuppeteerEvent } from "./puppetGetInfo";
 import getExistingEvents from "./getExistingEvents";
 
+import pLimit from "p-limit";
+
 const CWRU_ICAL_URL = "https://community.case.edu/ical/ical_cwru.ics";
 const CASE_ID = process.env.CASE_ID;
 const CASE_PASSWORD = process.env.CASE_PASSWORD;
@@ -70,6 +72,7 @@ export async function getAllEvents() {
     const events = [];
 
     const now = new Date();
+    const limit = pLimit(5);
 
     for (const id of eventIds) {
         if (existingEventIds.has(id)) {

@@ -48,16 +48,7 @@ export function EventsArea() {
 
     return (
         <>
-            <FormControlLabel
-                control={
-                    <Checkbox
-                        checked={inPersonOnly}
-                        onChange={(e) => setInPersonOnly(e.target.checked)}
-                    />
-                }
-                label="In Person Only"
-            />
-            <Events events={filteredEvents} />
+            <Events events={events} />
         </>
     );
 }
