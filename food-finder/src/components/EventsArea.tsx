@@ -5,29 +5,65 @@ import { FoodEvent } from "@/models/Event";
 import Events from "./Events";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
+import {
+    AppBar,
+    Autocomplete,
+    Box,
+    Divider,
+    Drawer,
+    Grid,
+    List,
+    Paper,
+    Skeleton,
+    Stack,
+    Switch,
+    TextField,
+    Toolbar,
+    Typography,
+    paperClasses,
+} from "@mui/material";
+import { toTitleCase } from "@/utils/misc";
+import { Container } from "@mui/material";
 
 interface InputStatus {
-    inPersonOnly: boolean;
+    onCampusOnly: boolean;
     excludeVolunteer: boolean;
+    pizzaOnly: boolean;
 }
 
-function filterEvents(events: FoodEvent[], inPersonOnly: boolean, excludeVolunteer: boolean) {
+function filterEvents(
+    events: FoodEvent[],
+    onCampusOnly: boolean,
+    excludeVolunteer: boolean,
+    pizzaOnly: boolean,
+    allowedCuisines: string[] = []
+) {
     let eventsFiltered = events;
-    if (inPersonOnly && excludeVolunteer) {
-        eventsFiltered = events.filter((event) => {
-            return event.location.name !== "Online Event" && event.food.volunteer === false;
-        });
-    } else if (inPersonOnly) {
-        eventsFiltered = events.filter((event) => {
-            return event.location.name !== "Online Event";
-        });
-    } else if (excludeVolunteer) {
-        eventsFiltered = events.filter((event) => {
-            return event.food.volunteer === false;
-        });
-    } else {
-        eventsFiltered = events;
+
+    if (onCampusOnly) {
+        eventsFiltered = eventsFiltered.filter((event) => event.location.onCampus);
     }
+
+    if (excludeVolunteer) {
+        eventsFiltered = eventsFiltered.filter(
+            (event) => (event.food.volunteer as unknown as string) === "false"
+        );
+    }
+
+    if (pizzaOnly) {
+        eventsFiltered = eventsFiltered.filter(
+            (event) =>
+                event.food.cuisine.toLowerCase().includes("pizza") ||
+                event.food.description.toLowerCase().includes("pizza")
+        );
+    }
+
+    if (allowedCuisines.length > 0) {
+        eventsFiltered = eventsFiltered.filter((event) => {
+            return allowedCuisines.includes(event.food.cuisine);
+        });
+    }
+
     return eventsFiltered;
 }
 
@@ -39,10 +75,10 @@ function sortEvents(events: FoodEvent[]) {
 
 export function EventsArea() {
     const [events, setEvents] = useState<FoodEvent[]>([]);
-    const [filteredEvents, setFilteredEvents] = useState<FoodEvent[]>([]);
     const [inputStatus, setInputStatus] = useState<InputStatus>({
-        inPersonOnly: false,
+        onCampusOnly: false,
         excludeVolunteer: false,
+        pizzaOnly: false,
     });
 
     useEffect(() => {
@@ -51,48 +87,143 @@ export function EventsArea() {
             .then((data) => {
                 console.log(data.data);
                 setEvents(
-                    sortEvents(
-                        data.data.filter((eventInfo: FoodEvent) => {
-                            return eventInfo !== undefined;
-                        }) as FoodEvent[]
+                    filterEvents(
+                        sortEvents(
+                            data.data.filter((eventInfo: FoodEvent) => {
+                                return eventInfo !== undefined;
+                            }) as FoodEvent[]
+                        ),
+                        inputStatus.onCampusOnly,
+                        inputStatus.excludeVolunteer,
+                        inputStatus.pizzaOnly
                     )
                 );
             });
     }, [inputStatus]);
 
-    console.log(filteredEvents);
+    const cuisines = useMemo(
+        () =>
+            Array.from(
+                new Set(
+                    events.map((event) => {
+                        return event.food.cuisine;
+                    })
+                )
+            ),
+        []
+    );
 
     return (
-        <>
-        
-            <div className="flex-col gap-3">
-                <FormControlLabel
-                    control={
-                        <Checkbox
-                            onChange={(e) =>
-                                setInputStatus({ ...inputStatus, inPersonOnly: e.target.checked })
+        <div className="relative mt-24">
+            <div
+                className="fixed z-50 bottom-4 right-4 bg-white m-2 rounded-lg p-4 drop-shadow-xl border-2 border-gray-500"
+                style={{ transform: "scale(0.9)", transformOrigin: "bottom right" }}
+            >
+                <Typography align="center" variant="h4">
+                    Filter Events
+                </Typography>
+
+                <div className="mt-2 mb-2">
+                    <Divider />
+                </div>
+
+                <Stack direction="row">
+                    <Stack>
+                        <Typography variant="h6">General Filters</Typography>
+                        <FormControlLabel
+                            control={
+                                <Switch
+                                    onChange={(e) =>
+                                        setInputStatus({
+                                            ...inputStatus,
+                                            onCampusOnly: e.target.checked,
+                                        })
+                                    }
+                                    checked={inputStatus.onCampusOnly}
+                                />
                             }
-                            checked={inputStatus.inPersonOnly}
+                            label="In Person Events"
                         />
-                    }
-                    label="In Person Events"
-                />
-                <FormControlLabel
-                    control={
-                        <Checkbox
-                            onChange={(e) =>
-                                setInputStatus({
-                                    ...inputStatus,
-                                    excludeVolunteer: e.target.checked,
-                                })
+                        <FormControlLabel
+                            control={
+                                <Switch
+                                    onChange={(e) =>
+                                        setInputStatus({
+                                            ...inputStatus,
+                                            excludeVolunteer: e.target.checked,
+                                        })
+                                    }
+                                    checked={inputStatus.excludeVolunteer}
+                                />
                             }
-                            checked={inputStatus.excludeVolunteer}
+                            label="Exclude Volunteer Events"
                         />
-                    }
-                    label="Exclude Volunteer Events"
-                />
+                        <FormControlLabel
+                            control={
+                                <Switch
+                                    onChange={(e) =>
+                                        setInputStatus({
+                                            ...inputStatus,
+                                            pizzaOnly: e.target.checked,
+                                        })
+                                    }
+                                    checked={inputStatus.pizzaOnly}
+                                />
+                            }
+                            label="Pizza Events only"
+                        />
+                    </Stack>
+
+                    <Paper
+                        variant="outlined"
+                        style={{
+                            border: "2px #aaa",
+                            backgroundColor: "transparent",
+                        }}
+                    >
+                        <Typography variant="h6">Filter by Cuisine</Typography>
+
+                        <Autocomplete
+                            multiple
+                            options={cuisines}
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    label="Cuisine"
+                                    variant="outlined" // Use outlined variant for better visibility
+                                    fullWidth // Take up the full width of the container
+                                />
+                            )}
+                            onChange={(_, value) => {
+                                setEvents(
+                                    filterEvents(
+                                        events,
+                                        inputStatus.onCampusOnly,
+                                        inputStatus.excludeVolunteer,
+                                        inputStatus.pizzaOnly,
+                                        value
+                                    )
+                                );
+                            }}
+                            style={{ minWidth: 400 }} // Set a minimum width to ensure readability
+                        />
+                    </Paper>
+                </Stack>
             </div>
-            <Events events={events} />
-        </>
+
+            <AppBar position="fixed" style={{ background: "#f0f0f0" }}>
+                <Typography variant="h2" align="center" sx={{ color: "black" }}>
+                    Find free food @CWRU!
+                </Typography>
+            </AppBar>
+
+            <Container maxWidth="lg">
+                {events && events.length && events.length > 1 ? (
+                    <Events events={events} />
+                ) : (
+                    <Skeleton variant="rectangular" width="100%" height="100%" />
+                )}
+            </Container>
+        </div>
     );
 }

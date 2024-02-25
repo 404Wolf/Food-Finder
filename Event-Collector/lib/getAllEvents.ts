@@ -55,7 +55,7 @@ async function puppetToCaseEvent(event: PuppeteerEvent, eventId: string): Promis
         description,
         date: new Date(time),
         bannerSrc:
-            bannerSrc && bannerSrc.length && bannerSrc.length > 0 ? bannerSrc[0] : "about:blank",
+            bannerSrc && bannerSrc.length && bannerSrc.length > 0 ? bannerSrc[0] : "/placeholder.webp",
         location,
     };
     return eventInfo;
@@ -100,6 +100,7 @@ export async function getAndStoreAllEvents() {
             console.debug(event);
         }
 
+        console.log(event);
         uploadEvent(event);
     }
 

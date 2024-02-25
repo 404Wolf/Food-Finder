@@ -1,15 +1,13 @@
 import Image from "next/image";
 import EventCard from "../components/EventCard";
 import { EventsArea } from "@/components/EventsArea";
-import { AppBar, Container } from "@mui/material";
+import { Container } from "@mui/material";
+import Appbar from "@/components/Appbar";
 
 export default async function Home() {
     return (
         <>
-            <AppBar position="static">Free food finder!</AppBar>
-            <Container maxWidth="lg">
-                <EventsArea />
-            </Container>
+            <EventsArea />
         </>
     );
 }

@@ -1,4 +1,5 @@
 import fs from "fs";
+import { configDotenv } from "dotenv";
 import OpenAI from "openai";
 import { FineTuningJobEvent } from "openai/resources/fine-tuning";
 
@@ -16,9 +17,10 @@ export function translateExamples() {
     const description = example.description;
 
     const response = JSON.stringify({
-      rating: example.rating,
+      rating: parseInt(example.rating),
       cuisine: example.cuisine,
-      volunteer: example.volunteer,
+      volunteer: example.volunteer === "true",
+      onCampus: example.onCampus === "true",
     });
 
     ex.push({
@@ -36,7 +38,7 @@ export function translateExamples() {
 
 // Modified from https://github.com/openai/openai-node/blob/master/examples/fine-tuning.ts
 export async function executeFineTuning() {
-  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  const openai = new OpenAI({ apiKey: configDotenv().parsed!.OPENAI_API_KEY });
 
   let file = await openai.files.create({
     file: fs.createReadStream(EXAMPLE_FILE),
@@ -52,7 +54,7 @@ export async function executeFineTuning() {
     if (file.status === "processed") {
       break;
     } else {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
     }
   }
 
@@ -76,7 +78,7 @@ export async function executeFineTuning() {
       console.log(`- ${timestamp.toLocaleTimeString()}: ${event.message}`);
     }
 
-    await new Promise((resolve) => setTimeout(resolve, 5000));
+    await new Promise((resolve) => setTimeout(resolve, 10000));
   }
 
   console.log("Fine tuning complete.");
