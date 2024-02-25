@@ -3,7 +3,7 @@ import { Food } from "../Event";
 import { configDotenv } from "dotenv";
 
 // Generated from /tuning/index.ts
-const FINE_TUNED_MODEL = "ft:gpt-3.5-turbo-0613:personal::8vzwlLaG";
+const FINE_TUNED_MODEL = "ft:gpt-3.5-turbo-0613:personal::8w0XHqim";
 
 const openai = new OpenAI({ apiKey: configDotenv().parsed.OPENAI_API_KEY });
 

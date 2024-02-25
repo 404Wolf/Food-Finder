@@ -29,6 +29,7 @@ interface InputStatus {
     onCampusOnly: boolean;
     excludeVolunteer: boolean;
     pizzaOnly: boolean;
+    cuisines?: string[];
 }
 
 function filterEvents(
@@ -41,7 +42,7 @@ function filterEvents(
     let eventsFiltered = events;
 
     if (onCampusOnly) {
-        eventsFiltered = eventsFiltered.filter((event) => event.location.onCampus);
+        eventsFiltered = eventsFiltered.filter((event) => event.food.onCampus);
     }
 
     if (excludeVolunteer) {
@@ -80,41 +81,46 @@ export function EventsArea() {
         excludeVolunteer: false,
         pizzaOnly: false,
     });
+    const [cuisines, setCuisines] = useState<string[]>([]);
 
     useEffect(() => {
         fetch("/api/events")
             .then((res) => res.json())
             .then((data) => {
-                console.log(data.data);
-                setEvents(
-                    filterEvents(
-                        sortEvents(
-                            data.data.filter((eventInfo: FoodEvent) => {
-                                return eventInfo !== undefined;
-                            }) as FoodEvent[]
-                        ),
-                        inputStatus.onCampusOnly,
-                        inputStatus.excludeVolunteer,
-                        inputStatus.pizzaOnly
+                if (events.length === 0) {
+                    setEvents(data.data);
+                }
+                setCuisines(
+                    Array.from(
+                        new Set(
+                            data.data.map((event: FoodEvent) => {
+                                return event.food.cuisine;
+                            })
+                        )
                     )
                 );
             });
-    }, [inputStatus]);
+    }, []);
 
-    const cuisines = useMemo(
-        () =>
-            Array.from(
-                new Set(
-                    events.map((event) => {
-                        return event.food.cuisine;
-                    })
-                )
+    const shownEvents = useMemo(() => {
+        console.log(inputStatus);
+        return filterEvents(
+            sortEvents(
+                events.filter((eventInfo: FoodEvent) => {
+                    return eventInfo !== undefined;
+                }) as FoodEvent[]
             ),
-        []
-    );
+            inputStatus.onCampusOnly,
+            inputStatus.excludeVolunteer,
+            inputStatus.pizzaOnly,
+            inputStatus.cuisines
+        );
+    }, [events, inputStatus]);
+
+    console.log(cuisines);
 
     return (
-        <div className="relative mt-24">
+        <div className="relative mt-24 mb-[400px]">
             <div
                 className="fixed z-50 bottom-4 right-4 bg-white m-2 rounded-lg p-4 drop-shadow-xl border-2 border-gray-500"
                 style={{ transform: "scale(0.9)", transformOrigin: "bottom right" }}
@@ -195,15 +201,7 @@ export function EventsArea() {
                                 />
                             )}
                             onChange={(_, value) => {
-                                setEvents(
-                                    filterEvents(
-                                        events,
-                                        inputStatus.onCampusOnly,
-                                        inputStatus.excludeVolunteer,
-                                        inputStatus.pizzaOnly,
-                                        value
-                                    )
-                                );
+                                setInputStatus({ ...inputStatus, cuisines: value });
                             }}
                             style={{ minWidth: 400 }} // Set a minimum width to ensure readability
                         />
@@ -218,8 +216,8 @@ export function EventsArea() {
             </AppBar>
 
             <Container maxWidth="lg">
-                {events && events.length && events.length > 1 ? (
-                    <Events events={events} />
+                {shownEvents.length > 1 ? (
+                    <Events events={shownEvents} />
                 ) : (
                     <Skeleton variant="rectangular" width="100%" height="100%" />
                 )}
