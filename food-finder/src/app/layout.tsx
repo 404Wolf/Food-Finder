@@ -30,6 +30,8 @@ export default function RootLayout({
                     <body className={inter.className}> {children} </body>
                 </AppRouterCacheProvider>
             </ThemeProvider>
+
+            <Analytics />
         </html>
     );
 }
