@@ -47,7 +47,7 @@ function filterEvents(
 
     if (excludeVolunteer) {
         eventsFiltered = eventsFiltered.filter(
-            (event) => (event.food.volunteer as unknown as string) === "false"
+            (event) => !event.food.volunteer
         );
     }
 
