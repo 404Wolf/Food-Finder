@@ -12,6 +12,10 @@ const theme: ThemeOptions = createTheme({
             main: "#f50057",
         },
     },
+    typography: {
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"', // Use Roboto as an example font
+        fontSize: 11, // Set a smaller default font size
+      },
 });
 
 export default theme;

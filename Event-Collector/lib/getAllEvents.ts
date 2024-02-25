@@ -2,7 +2,7 @@ import { getAuthHeaders, getEventInfo } from "./puppetGetInfo";
 import nodeIcal, { VEvent } from "node-ical";
 import pLimit from "p-limit";
 
-import { Event, Food, FoodEvent } from "../Event";
+import { Event, FoodEvent } from "../Event";
 import { analyzer } from "./getFoodInfo";
 import { uploadEvent } from "./uploadEvents";
 import { PuppeteerEvent } from "./puppetGetInfo";
@@ -21,8 +21,6 @@ export async function getEventIds() {
         if (key === "vcalendar") continue;
 
         const event = events[key] as VEvent;
-
-        const date = new Date(event.start);
 
         const now = new Date();
 
