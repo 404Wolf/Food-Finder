@@ -45,12 +45,6 @@ const App = () => {
                     </Toolbar>
                 </AppBar>
             </div>
-            <Box mt={12} textAlign="center">
-                <Typography align="center" color="black">
-                    Find free food on campus! Below is a listing of events on campus that claim to
-                    offer free food.
-                </Typography>
-            </Box>
         </div>
     );
 };
