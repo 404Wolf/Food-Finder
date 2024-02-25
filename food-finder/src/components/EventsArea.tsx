@@ -203,7 +203,7 @@ export function EventsArea() {
 
             <Container maxWidth="lg">
                 {shownEvents.length > 1 ? (
-                    <div className="mt-36 sm:mt-0">
+                    <div className="-mt-4 sm:mt-0">
                     <Events events={shownEvents} /></div>
                 ) : (
                     <Skeleton variant="rectangular" width="100%" height="100%" />
