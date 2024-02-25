@@ -15,6 +15,8 @@ export const GET = async (): Promise<Response> => {
             // && event.date > new Date();
         });
     client.close();
+    events = events.sort((a, b) => a.date.getTime() - b.date.getTime());
+    events = events.filter((event) => event.date > new Date());
 
     return Response.json({ success: true, data: events });
 };

@@ -7,6 +7,7 @@ import { analyzer } from "./getFoodInfo";
 import { uploadEvent } from "./uploadEvents";
 import { PuppeteerEvent } from "./puppetGetInfo";
 import getExistingEvents from "./getExistingEvents";
+import sendFinalMetadata from "./sendFinalMetadata";
 
 const CWRU_ICAL_URL = "https://community.case.edu/ical/ical_cwru.ics";
 const CASE_ID = process.env.CASE_ID;
@@ -55,7 +56,9 @@ async function puppetToCaseEvent(event: PuppeteerEvent, eventId: string): Promis
         description,
         date: new Date(time),
         bannerSrc:
-            bannerSrc && bannerSrc.length && bannerSrc.length > 0 ? bannerSrc[0] : "/placeholder.webp",
+            bannerSrc && bannerSrc.length && bannerSrc.length > 0
+                ? bannerSrc[0]
+                : "/placeholder.webp",
         location,
     };
     return eventInfo;
@@ -110,9 +113,16 @@ export async function getAndStoreAllEvents() {
         return Promise.race([promise, timeout(timeoutMs)]);
     };
 
-    await Promise.all(eventIds.map(
-        id => withTimeout(limit(async () => await getAndUploadEvent(id)), 60000)
-    ));
+    await Promise.all(
+        eventIds.map((id) =>
+            withTimeout(
+                limit(async () => await getAndUploadEvent(id)),
+                60000
+            )
+        )
+    );
+
+    await sendFinalMetadata();
 
     // const events = await Promise.all(eventIds.map(
     //     id => limit(async () => await getEvent(id))

@@ -20,7 +20,11 @@ export interface PuppeteerEvent {
 const URL = "https://community.case.edu/brewcwru/rsvp_boot?id=2254804";
 
 export async function getAuthHeaders(caseId: string, casePassword: string) {
-    const browser = await puppeteer.launch({ headless: true });
+    const browser = await puppeteer.launch({
+        headless: true,
+        args: ["--no-sandbox"],
+        ignoreDefaultArgs: ["--disable-extensions"],
+    });
     const page = await browser.newPage();
 
     await page.goto("https://login.case.edu/cas/login");
@@ -29,12 +33,12 @@ export async function getAuthHeaders(caseId: string, casePassword: string) {
     await page.click('input[name="submit"]');
 
     await page.goto("https://www.campusgroups.com/shibboleth/login?idp=cwru");
-    await page.waitForSelector('[id="button-menu-mobile"]');
+    await page.waitForSelector('[id="button-menu-mobile"]', { timeout: 100000 });
     await page.goto(URL);
 
     const cookies = await page.cookies();
     const headers = {
-        'Cookie': cookies.map((ck) => `${ck.name}=${ck.value}`).join("; "),
+        Cookie: cookies.map((ck) => `${ck.name}=${ck.value}`).join("; "),
     };
     await browser.close();
 
@@ -44,7 +48,6 @@ export async function getAuthHeaders(caseId: string, casePassword: string) {
 export async function getEventInfo(eventId: string, headers): Promise<PuppeteerEvent | null> {
     const eventText = await fetch(`https://community.case.edu/brewcwru/rsvp_boot?id=${eventId}`, {
         headers: headers,
-        referrerPolicy: "strict-origin-when-cross-origin",
         body: null,
         method: "GET",
     }).then((response) => response.text());
