@@ -6,8 +6,7 @@ Well, good news everyone. You can now FIND FOOOOOOD!!!
 
 ---
 
-Food Finder is a website providing analyses.
-
+Food Finder is a website summarizing all CWRU CampusGroups events that provide food, presenting them in a clean and digestible webpage.
 
 
 ## Vision

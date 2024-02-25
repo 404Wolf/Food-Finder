@@ -117,8 +117,6 @@ export function EventsArea() {
         );
     }, [events, inputStatus]);
 
-    console.log(cuisines);
-
     return (
         <div className="relative mt-24 mb-[400px]">
             <div
@@ -208,12 +206,6 @@ export function EventsArea() {
                     </Paper>
                 </Stack>
             </div>
-
-            <AppBar position="fixed" style={{ background: "#f0f0f0" }}>
-                <Typography variant="h2" align="center" sx={{ color: "black" }}>
-                    Find free food @CWRU!
-                </Typography>
-            </AppBar>
 
             <Container maxWidth="lg">
                 {shownEvents.length > 1 ? (
