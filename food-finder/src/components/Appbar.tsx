@@ -32,13 +32,12 @@ const App = () => {
                                         Find free food @CWRU!
                                     </Typography>
                                 </div>
-
                                 <a
-                                    href="https://www.youtube.com/watch?v=j5C6X9vOEkU"
+                                    href="https://github.com/404Wolf/Food-Finder"
                                     target="_blank"
                                     rel="noopener noreferrer"
                                 >
-                                    <div className="hidden sm:block overflow-visible h-max fixed -left-24 -bottom-24 -translate-y-1 -translate-x-1 scale-[50%] hidden sm:block">
+                                    <div className="overflow-visible h-max fixed transition duration-200 -left-24 -bottom-24  hover:-bottom-22 -translate-y-1 -translate-x-1 scale-[50%] hidden sm:block">
                                         <Image
                                             src="/logo.webp"
                                             alt="Our logo"
