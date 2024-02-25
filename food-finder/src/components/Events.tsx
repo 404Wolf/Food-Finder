@@ -15,7 +15,7 @@ export default function Events(props: { events: FoodEvent[] }) {
             {props.events
                 .filter((event) => event !== undefined)
                 .map((event, i) => (
-                    <div className="basis-1/2">
+                    <div className="basis-1/2" key={-i}>
                         <EventCard eventInfo={event} key={i} />
                     </div>
                 ))}
