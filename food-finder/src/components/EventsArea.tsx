@@ -1,10 +1,15 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { FoodEvent } from "@/models/Event";
 import Events from "./Events";
 import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
+
+interface InputStatus {
+    inPersonOnly: boolean;
+    excludeVolunteer: boolean;
+}
 
 function filterEvents(events: FoodEvent[], inPersonOnly: boolean, excludeVolunteer: boolean) {
     let eventsFiltered = events;
@@ -26,19 +31,19 @@ function filterEvents(events: FoodEvent[], inPersonOnly: boolean, excludeVolunte
     return eventsFiltered;
 }
 
+function sortEvents(events: FoodEvent[]) {
+    return events.sort((a, b) => {
+        return a.date < b.date ? -1 : 1;
+    });
+}
+
 export function EventsArea() {
     const [events, setEvents] = useState<FoodEvent[]>([]);
     const [filteredEvents, setFilteredEvents] = useState<FoodEvent[]>([]);
-    const [inPersonOnly, setInPersonOnly] = useState(false);
-    const [excludeVolunteer, setExcludeVolunteer] = useState(false);
-
-    useEffect(() => {
-        setFilteredEvents(events);
-    }, [events]);
-
-    useEffect(() => {
-        filterEvents(events, inPersonOnly, excludeVolunteer);
-    }, [inPersonOnly, excludeVolunteer]);
+    const [inputStatus, setInputStatus] = useState<InputStatus>({
+        inPersonOnly: false,
+        excludeVolunteer: false,
+    });
 
     useEffect(() => {
         fetch("/api/events")
@@ -46,37 +51,48 @@ export function EventsArea() {
             .then((data) => {
                 console.log(data.data);
                 setEvents(
-                    data.data.filter((eventInfo: FoodEvent) => {
-                        return eventInfo !== undefined;
-                    }) as FoodEvent[]
+                    sortEvents(
+                        data.data.filter((eventInfo: FoodEvent) => {
+                            return eventInfo !== undefined;
+                        }) as FoodEvent[]
+                    )
                 );
-            })
-            .catch((err) => console.error(err));
-    }, []);
+            });
+    }, [inputStatus]);
 
     console.log(filteredEvents);
 
     return (
         <>
-            <FormControlLabel
-                control={
-                    <Checkbox
-                        checked={inPersonOnly}
-                        onChange={(e) => setInPersonOnly(e.target.checked)}
-                    />
-                }
-                label="In Person Only"
-            />
-            <FormControlLabel
-                control={
-                    <Checkbox
-                        checked={excludeVolunteer}
-                        onChange={(e) => setExcludeVolunteer(e.target.checked)}
-                    />
-                }
-                label="Exclude Volunteer Events"
-            />
-            <Events events={filteredEvents} />
+        
+            <div className="flex-col gap-3">
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            onChange={(e) =>
+                                setInputStatus({ ...inputStatus, inPersonOnly: e.target.checked })
+                            }
+                            checked={inputStatus.inPersonOnly}
+                        />
+                    }
+                    label="In Person Events"
+                />
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            onChange={(e) =>
+                                setInputStatus({
+                                    ...inputStatus,
+                                    excludeVolunteer: e.target.checked,
+                                })
+                            }
+                            checked={inputStatus.excludeVolunteer}
+                        />
+                    }
+                    label="Exclude Volunteer Events"
+                />
+            </div>
+            <Events events={events} />
         </>
     );
 }

@@ -12,6 +12,10 @@ const StyledCard = styled(Card)(({ theme }) => ({
     height: "100%",
     width: "100%",
     borderRadius: "10px",
+    transition: "transform 0.15s ease-in-out",
+    "&:hover": {
+        transform: "scale3d(1.05, 1.05, 1)",
+    },
 }));
 
 function truncateString(input: string, charsToKeep: number): string {
@@ -44,7 +48,7 @@ export default function EventCard(props: { eventInfo: FoodEvent }) {
 
     return (
         <div className="flex justify-stretch justify-items-center relative h-full">
-            <StyledCard className="flex-col h-[12rem] pb-[10px]">
+            <StyledCard className="flex-row h-[12rem] pb-[10px]">
                 <div className="relative h-full p-2">
                     <Typography variant="h6" className="text-center rounded-lg">
                         {truncateString(props.eventInfo.name, 50)}
@@ -78,22 +82,28 @@ export default function EventCard(props: { eventInfo: FoodEvent }) {
                                 <Typography>
                                     {truncateString(props.eventInfo.food.description, 200)}
                                 </Typography>
-
-                                <div className="flex gap-1 -ml-1 mt-1">
-                                    {props.eventInfo.food.volunteer as any as string === "true" && (
+                                <div className="flex-col relative -bottom-1 ">
                                         <Chip
-                                            label="Volunteer"
-                                            variant="outlined"
-                                            className="scale-90"
                                             size="small"
+                                            variant="outlined"
+                                            label={props.eventInfo.location.name}
                                         />
-                                    )}
-                                    <Chip
-                                        label="Free"
-                                        variant="outlined"
-                                        className="scale-90"
-                                        size="small"
-                                    />
+
+                                    <div className="mt-3"></div>
+
+                                    <div className="">
+                                        <Chip label={niceDate} variant="outlined" size="small" />
+                                        {(props.eventInfo.food.volunteer as any as string) ===
+                                            "true" && (
+                                            <Chip
+                                                label="Volunteer"
+                                                variant="outlined"
+                                                size="small"
+                                            />
+                                        )}
+                                    </div>
+
+                                    <Chip label="Free" variant="outlined" size="small" />
                                 </div>
                             </div>
                         </CardContent>

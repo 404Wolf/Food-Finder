@@ -1,5 +1,6 @@
 import puppeteer from "puppeteer";
 import { JSDOM } from "jsdom";
+import he from "he";
 
 export interface PuppeteerEvent {
     "@context": string;
@@ -53,7 +54,9 @@ export async function getEventInfo(eventId: string, headers): Promise<PuppeteerE
 
     // In the event we could not fetch the element, ignore this event
     try {
-        return JSON.parse(element.innerHTML);
+        const data = JSON.parse(element.innerHTML);
+        data.description = he.decode(data.description);
+        return data;
     } catch {
         console.debug(`Failed to fetch and parse event id ${eventId}`);
         return null;
