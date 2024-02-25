@@ -10,6 +10,9 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
     title: "Free Food Finder",
     description: "Hack CWRU 2024 Project",
+    icons: {
+        icon: "/icon.ico",
+    },
 };
 
 export default function RootLayout({
@@ -19,6 +22,8 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
+            <link rel="icon" href="/favicon.ico" sizes="any" />
+
             <ThemeProvider theme={theme}>
                 <AppRouterCacheProvider options={{ key: "css" }}>
                     <body className={inter.className}> {children} </body>

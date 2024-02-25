@@ -104,16 +104,16 @@ export function EventsArea() {
 
     const shownEvents = useMemo(() => {
         console.log(inputStatus);
-        return filterEvents(
-            sortEvents(
+        return sortEvents(
+            filterEvents(
                 events.filter((eventInfo: FoodEvent) => {
                     return eventInfo !== undefined;
-                }) as FoodEvent[]
-            ),
-            inputStatus.onCampusOnly,
-            inputStatus.excludeVolunteer,
-            inputStatus.pizzaOnly,
-            inputStatus.cuisines
+                }) as FoodEvent[],
+                inputStatus.onCampusOnly,
+                inputStatus.excludeVolunteer,
+                inputStatus.pizzaOnly,
+                inputStatus.cuisines
+            )
         );
     }, [events, inputStatus]);
 
