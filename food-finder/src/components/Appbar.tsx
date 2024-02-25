@@ -20,26 +20,34 @@ const App = () => {
                                     />
                                 </div>
 
-                                <Typography
-                                    variant="h2"
-                                    align="center"
-                                    marginTop="5px"
-                                    marginBottom="5px"
-                                    sx={{ color: "white" }}
-                                    fontFamily='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"'
-                                >
-                                    Find free food @CWRU!
-                                </Typography>
-
-                                <div className="overflow-visible h-max fixed -left-24 -bottom-24 -translate-y-1 -translate-x-1 scale-[50%] hidden sm:block">
-                                    <Image
-                                        src="/logo.webp"
-                                        alt="Our logo"
-                                        width={400}
-                                        height={400}
-                                        className="h-full"
-                                    />
+                                <div className="scale-75 sm:scale-100">
+                                    <Typography
+                                        variant="h2"
+                                        align="center"
+                                        marginTop="5px"
+                                        marginBottom="5px"
+                                        sx={{ color: "white" }}
+                                        fontFamily='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"'
+                                    >
+                                        Find free food @CWRU!
+                                    </Typography>
                                 </div>
+
+                                <a
+                                    href="https://www.youtube.com/watch?v=j5C6X9vOEkU"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                >
+                                    <div className="hidden sm:block overflow-visible h-max fixed -left-24 -bottom-24 -translate-y-1 -translate-x-1 scale-[50%] hidden sm:block">
+                                        <Image
+                                            src="/logo.webp"
+                                            alt="Our logo"
+                                            width={400}
+                                            height={400}
+                                            className="h-full"
+                                        />
+                                    </div>
+                                </a>
                             </div>
                         </Container>
                     </Toolbar>

@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import EventCard from "@/components/EventCard";
 import { FoodEvent } from "@/models/Event";
-import Grid from "@mui/material/Unstable_Grid2"; // Grid version 2
 
 export default function Events(props: { events: FoodEvent[] }) {
     if (props.events === undefined) {
