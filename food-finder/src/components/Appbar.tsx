@@ -56,14 +56,3 @@ const App = () => {
 };
 
 export default App;
-            <div className="">
-                <Typography align="center" color="black">
-                    Find free food on campus! Below is a listing of events on campus that claim to
-                    offer free food.
-                </Typography>
-            </div>
-        </div>
-    );
-};
-
-export default App;
