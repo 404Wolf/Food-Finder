@@ -76,7 +76,7 @@ export async function getAndStoreAllEvents() {
 
     async function getAndUploadEvent(id: string) {
         if (existingEventIds.has(id)) {
-            console.debug(`Skipping event ${id}`);
+            console.debug(`Skipping event ${id} because it has already been fetched`);
             return;
         }
 
