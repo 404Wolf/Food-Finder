@@ -59,6 +59,7 @@ export async function getEventInfo(eventId: string, headers): Promise<PuppeteerE
     try {
         const data = JSON.parse(element.innerHTML);
         data.description = he.decode(data.description);
+        console.debug(`Fetched event id ${eventId}`);
         return data;
     } catch {
         console.debug(`Failed to fetch and parse event id ${eventId}`);

@@ -9,6 +9,6 @@ export async function mongoConnect() {
 
     const client = new MongoClient(uri);
     await client.connect();
-    const database = client.db("freefood-test");
+    const database = client.db(process.env.EVENT_DATABASE_NAME);
     return { db: database, client: client };
 }

@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { Card, CardContent, Typography, CardMedia, Rating, Chip } from "@mui/material";
 import { styled } from "@mui/material/styles";
-import { FoodEvent } from "@/models/Event";
+import { Event } from "@/models/Event";
 import { toTitleCase } from "@/utils/misc";
 
 const StyledCard = styled(Card)(({ theme }) => ({
@@ -30,7 +30,7 @@ function truncateString(input: string, charsToKeep: number): string {
 
     return truncatedString + "...";
 }
-function generateGoogleCalendarURL(description: string, date: Date, name: string) {
+function generateGoogleCalendarURL(description: string, date: Date, location: string, name: string) {
     // Format the date as required by Google Calendar (YYYYMMDDTHHmmssZ)
     const formattedDate = new Date(date)
         .toISOString()
@@ -50,12 +50,13 @@ function generateGoogleCalendarURL(description: string, date: Date, name: string
     const escapedName = encodeURIComponent(name);
 
     // Construct the Google Calendar URL
-    const googleCalendarURL = `https://www.google.com/calendar/render?action=TEMPLATE&text=${escapedName}&details=${escapedDescription}&dates=${formattedDate}/${formattedEndDate}`;
+    const escapedLocation = encodeURIComponent(location);
+    const googleCalendarURL = `https://www.google.com/calendar/render?action=TEMPLATE&text=${escapedName}&details=${escapedDescription}&location=${escapedLocation}&dates=${formattedDate}/${formattedEndDate}`;
 
     return googleCalendarURL;
 }
 
-export default function EventCard(props: { eventInfo: FoodEvent }) {
+export default function EventCard(props: { eventInfo: Event }) {
     const date = new Date(props.eventInfo.date);
     const niceDate = date.toLocaleDateString("en-US", {
         weekday: "long",
@@ -129,6 +130,7 @@ export default function EventCard(props: { eventInfo: FoodEvent }) {
                                         href={generateGoogleCalendarURL(
                                             props.eventInfo.food.description,
                                             props.eventInfo.date,
+                                            props.eventInfo.location.address,
                                             props.eventInfo.name + " (Free food!)"
                                         )}
                                         target="_blank"
@@ -144,7 +146,7 @@ export default function EventCard(props: { eventInfo: FoodEvent }) {
                                     </a>
 
                                     <div className="flex justify-between justify-items-left justify-left gap-2">
-                                        {(props.eventInfo.food.volunteer as any as string) && (
+                                        {(props.eventInfo.volunteer as any as string) && (
                                             <Chip
                                                 label="Volunteer"
                                                 variant="outlined"
@@ -152,7 +154,7 @@ export default function EventCard(props: { eventInfo: FoodEvent }) {
                                             />
                                         )}
 
-                                        {(props.eventInfo.food.onCampus as any as string) && (
+                                        {(props.eventInfo.onCampus as any as string) && (
                                             <Chip
                                                 label="On Campus"
                                                 variant="outlined"

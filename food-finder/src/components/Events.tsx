@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import EventCard from "@/components/EventCard";
-import { FoodEvent } from "@/models/Event";
+import { Event } from "@/models/Event";
 
-export default function Events(props: { events: FoodEvent[] }) {
+export default function Events(props: { events: Event[] }) {
     if (props.events === undefined) {
         return <div></div>;
     }

@@ -2,7 +2,7 @@ import { getAuthHeaders, getEventInfo } from "./puppetGetInfo";
 import nodeIcal, { VEvent } from "node-ical";
 import pLimit from "p-limit";
 
-import { Event, FoodEvent } from "../Event";
+import { Event, FoodInfo, IcalEvent } from "../Event";
 import { analyzer } from "./getFoodInfo";
 import { uploadEvent } from "./uploadEvents";
 import { PuppeteerEvent } from "./puppetGetInfo";
@@ -23,10 +23,8 @@ export async function getEventIds() {
 
         const event = events[key] as VEvent;
 
-        const now = new Date();
-
         // If the event has already passed, don't bother analyzing it
-        if (event.start < now) {
+        if (event.start < new Date()) {
             console.debug(`Skipping event ${event.location} because it has already passed`);
             continue;
         }
@@ -39,18 +37,19 @@ export async function getEventIds() {
 
         eventIds.push(id);
     }
-    console.log(eventIds);
+
+    console.log(`Fetched event IDs:\n${JSON.stringify(eventIds)}`);
     return eventIds;
 }
 
-async function puppetToCaseEvent(event: PuppeteerEvent, eventId: string): Promise<Event> {
+async function puppetToCaseEvent(event: PuppeteerEvent, eventId: string): Promise<IcalEvent> {
     const name = event.name;
     const description = event.description;
     const time = event.startDate;
     const bannerSrc = event.image;
     const location = event.location;
 
-    const eventInfo: Event = {
+    const eventInfo: IcalEvent = {
         _id: Number.parseInt(eventId),
         name: name,
         description,
@@ -60,6 +59,7 @@ async function puppetToCaseEvent(event: PuppeteerEvent, eventId: string): Promis
                 ? bannerSrc[0]
                 : "/placeholder.webp",
         location,
+        fetchedAt: new Date(),
     };
     return eventInfo;
 }
@@ -71,8 +71,7 @@ export async function getAndStoreAllEvents() {
     const existingEventIds = new Set(dbEvents.map((x) => x._id.toString()));
     const eventIds = await getEventIds();
 
-    const now = new Date();
-    const limit = pLimit(10);
+    const limit = pLimit(15);
 
     async function getAndUploadEvent(id: string) {
         if (existingEventIds.has(id)) {
@@ -83,28 +82,43 @@ export async function getAndStoreAllEvents() {
         const data = await getEventInfo(id, authHeaders);
         if (!data) return;
 
-        const eventInfo = await puppetToCaseEvent(data, id);
+        const eventPageInfo = await puppetToCaseEvent(data, id);
 
         // If the event has already passed, don't bother analyzing it
-        if (eventInfo.date < now) {
+        if (eventPageInfo.date < new Date()) {
             console.debug(`Skipping event ${id} because it has already passed`);
             return;
         }
 
-        const foodInfo = await analyzer.analyze(eventInfo.description);
-        if (!foodInfo) return;
-
-        const event: FoodEvent = {
-            food: foodInfo,
-            ...eventInfo,
-            fetchedAt: new Date(),
-        };
-        if (event.food.rating > 0) {
-            console.debug(event);
+        const eventAiInfo = await analyzer.analyze(
+            eventPageInfo.name + "\n" + eventPageInfo.description
+        );
+        if (!eventAiInfo) {
+            console.debug(
+                `Skipping fetching additional info for event ${id} because it has no food`
+            );
+            return;
         }
 
-        console.log(event);
-        uploadEvent(event);
+        const foodEvent: Event = {
+            ...eventPageInfo,
+            food: {
+                description: eventAiInfo.description,
+                rating: eventAiInfo.rating,
+                cuisine: eventAiInfo.cuisine,
+                volunteer: eventAiInfo.volunteer,
+                fetchedAt: new Date(),
+            },
+            onCampus: eventAiInfo.onCampus,
+            fetchedAt: new Date(),
+        };
+        if (foodEvent.food.rating > 0) {
+            console.debug(`Fetched event:\n${JSON.stringify(foodEvent)}`);
+            uploadEvent(foodEvent);
+        }
+        else {
+            console.debug(`Skipping event ${id} because it has no food`);
+        }
     }
 
     const timeout = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -123,12 +137,4 @@ export async function getAndStoreAllEvents() {
     );
 
     await sendFinalMetadata();
-
-    // const events = await Promise.all(eventIds.map(
-    //     id => limit(async () => await getEvent(id))
-    // ));
-
-    // uploadEvents(events);
-
-    // console.debug(`Fetched events:\n${JSON.stringify(events)}`);
 }

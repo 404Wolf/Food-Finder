@@ -1,5 +1,9 @@
+interface fetchedAt {
+    fetchedAt: Date;
+}
+
 // Event represents a parsed event loaded from the iCal
-export interface Event {
+export interface IcalEvent extends fetchedAt {
     _id: number; // "1234567890"
     name: string; // "Case for a Cause"
     description: string; // "A charity event to raise money for the homeless"
@@ -13,16 +17,16 @@ export interface Event {
 }
 
 // Food represents a parsed response from the AI, evaluating the quality of food provided at the event
-export interface Food {
+export interface FoodInfo extends fetchedAt {
     rating: number; // 1-10
     description: string; // "cheap snacks" or "fully prepared feast"
     cuisine: string; // "Italian" or "Mexican"
     volunteer: boolean; // true or false
-    onCampus: boolean; // true or false
 }
 
 // Event represents a pair of Event and Food, for spending to the front end
-export interface FoodEvent extends Event {
-    food: Food; // A Food object
+export interface Event extends IcalEvent {
+    food: FoodInfo; // A Food object
+    onCampus: boolean; // true or false
     fetchedAt: Date; // "2021-04-20T12:00:00Z"
 }
