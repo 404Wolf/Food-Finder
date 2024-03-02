@@ -30,3 +30,7 @@ export interface Event extends IcalEvent {
     fetchedAt: Date; // "2021-04-20T12:00:00Z"
     description: string; // "cheap snacks" or "fully prepared feast"
 }
+
+export interface Failure extends fetchedAt {
+    _id: number;
+}

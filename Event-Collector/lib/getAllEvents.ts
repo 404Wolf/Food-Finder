@@ -4,10 +4,10 @@ import pLimit from "p-limit";
 
 import { Event, IcalEvent } from "../Event";
 import { analyzer } from "./getFoodInfo";
-import { uploadEvent } from "./uploadEvents";
+import { uploadEvent, uploadFailure } from "./uploadEvents";
 import { PuppeteerEvent } from "./puppetGetInfo";
 import getExistingEvents from "./getExistingEvents";
-import sendFinalMetadata from "./sendFinalMetadata";
+import { mongoConnect } from "./mongoConnect";
 
 const CWRU_ICAL_URL = "https://community.case.edu/ical/ical_cwru.ics";
 const CASE_ID = process.env.CASE_ID;
@@ -43,35 +43,41 @@ export async function getEventIds() {
 }
 
 async function puppetToCaseEvent(event: PuppeteerEvent, eventId: string): Promise<IcalEvent> {
-    const name = event.name;
-    const description = event.description;
-    const time = event.startDate;
-    const bannerSrc = event.image;
-    const location = event.location;
+    try {
+        const name = event.name;
+        const description = event.description;
+        const time = event.startDate;
+        const bannerSrc = event.image;
+        const location = event.location;
 
-    const eventInfo: IcalEvent = {
-        _id: Number.parseInt(eventId),
-        name: name,
-        description,
-        date: new Date(time),
-        bannerSrc:
-            bannerSrc && bannerSrc.length && bannerSrc.length > 0
-                ? bannerSrc[0]
-                : "/placeholder.webp",
-        location,
-        fetchedAt: new Date(),
-    };
-    return eventInfo;
+        const eventInfo: IcalEvent = {
+            _id: Number.parseInt(eventId),
+            name: name,
+            description,
+            date: new Date(time),
+            bannerSrc:
+                bannerSrc && bannerSrc.length && bannerSrc.length > 0
+                    ? bannerSrc[0]
+                    : "/placeholder.webp",
+            location,
+            fetchedAt: new Date(),
+        };
+        return eventInfo;
+    } catch (e) {
+        console.error(`Error in puppetToCaseEvent: ${e}`);
+        return null;
+    }
 }
 
 export async function getAndStoreAllEvents() {
+    const { db, client } = await mongoConnect();
+    const dbMetadata = await db.collection("metadata");
     const authHeaders = await getAuthHeaders(CASE_ID, CASE_PASSWORD);
+    const existingEventIds = await getExistingEvents();
 
-    const dbEvents = await getExistingEvents();
-    const existingEventIds = new Set(dbEvents.map((x) => x._id.toString()));
     const eventIds = await getEventIds();
 
-    const limit = pLimit(15);
+    const limit = pLimit(50);
 
     async function getAndUploadEvent(id: string) {
         if (existingEventIds.has(id)) {
@@ -80,9 +86,16 @@ export async function getAndStoreAllEvents() {
         }
 
         const data = await getEventInfo(id, authHeaders);
-        if (!data) return;
+        if (data === null) {
+            uploadFailure({ _id: Number.parseInt(id) });
+        }
 
         const eventPageInfo = await puppetToCaseEvent(data, id);
+        if (eventPageInfo === null) {
+            console.debug(`Skipping event ${id} because it couldn't be fetched`);
+            uploadFailure({ _id: Number.parseInt(id) });
+            return;
+        }
 
         // If the event has already passed, don't bother analyzing it
         if (eventPageInfo.date < new Date()) {
@@ -131,5 +144,9 @@ export async function getAndStoreAllEvents() {
         )
     );
 
-    await sendFinalMetadata();
+    await dbMetadata.updateOne(
+        { name: "refreshedAt" },
+        { $set: { date: new Date() } },
+        { upsert: true }
+    );
 }

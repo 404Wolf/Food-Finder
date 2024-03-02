@@ -1,10 +1,18 @@
 import { mongoConnect } from "./mongoConnect";
-import { Event } from "../Event";
 
-export default async function getExistingEvents(): Promise<Event[]> {
+export default async function getExistingEvents(): Promise<Set<string>> {
     const { db, client } = await mongoConnect();
-    const collection = db.collection("events");
-    const events = await collection.find({}, { projection: { _id: 1 } }).toArray();
+
+    const successCollection = db.collection("events");
+    const successIds = (await successCollection.distinct("_id")).map((x) =>
+        x.toString()
+    ) as string[];
+    const failuresCollection = db.collection("failures");
+    const failureIds = (await failuresCollection.distinct("_id")).map((x) =>
+        x.toString()
+    ) as string[];
+
     client.close();
-    return events as unknown as Event[];
+
+    return new Set([...successIds, ...failureIds]);
 }
