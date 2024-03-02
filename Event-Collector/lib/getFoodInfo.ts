@@ -32,6 +32,7 @@ export const analyzer = {
                 cuisine: data.cuisine,
                 volunteer: data.volunteer,
                 fetchedAt: new Date(),
+                onCampus: data.onCampus,
             };
 
             return foodInfo;
