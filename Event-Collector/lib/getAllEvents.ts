@@ -74,6 +74,7 @@ export async function getAndStoreAllEvents() {
     const dbMetadata = await db.collection("metadata");
     const authHeaders = await getAuthHeaders(CASE_ID, CASE_PASSWORD);
     const existingEventIds = await getExistingEvents();
+    
 
     const eventIds = await getEventIds();
 
