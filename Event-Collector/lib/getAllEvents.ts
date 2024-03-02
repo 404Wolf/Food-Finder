@@ -2,7 +2,7 @@ import { getAuthHeaders, getEventInfo } from "./puppetGetInfo";
 import nodeIcal, { VEvent } from "node-ical";
 import pLimit from "p-limit";
 
-import { Event, FoodInfo, IcalEvent } from "../Event";
+import { Event, IcalEvent } from "../Event";
 import { analyzer } from "./getFoodInfo";
 import { uploadEvent } from "./uploadEvents";
 import { PuppeteerEvent } from "./puppetGetInfo";
@@ -95,7 +95,7 @@ export async function getAndStoreAllEvents() {
         );
         if (!eventAiInfo) {
             console.debug(
-                `Skipping fetching additional info for event ${id} because it has no food`
+                `Skipping fetching additional info for event ${id} because ai couldn't analyze it`
             );
             return;
         }
@@ -103,7 +103,6 @@ export async function getAndStoreAllEvents() {
         const foodEvent: Event = {
             ...eventPageInfo,
             food: {
-                description: eventAiInfo.description,
                 rating: eventAiInfo.rating,
                 cuisine: eventAiInfo.cuisine,
                 volunteer: eventAiInfo.volunteer,
@@ -112,13 +111,9 @@ export async function getAndStoreAllEvents() {
             onCampus: eventAiInfo.onCampus,
             fetchedAt: new Date(),
         };
-        if (foodEvent.food.rating > 0) {
-            console.debug(`Fetched event:\n${JSON.stringify(foodEvent)}`);
-            uploadEvent(foodEvent);
-        }
-        else {
-            console.debug(`Skipping event ${id} because it has no food`);
-        }
+
+        console.debug(`Fetched event:\n${JSON.stringify(foodEvent)}`);
+        uploadEvent(foodEvent);
     }
 
     const timeout = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));

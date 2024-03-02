@@ -30,7 +30,12 @@ function truncateString(input: string, charsToKeep: number): string {
 
     return truncatedString + "...";
 }
-function generateGoogleCalendarURL(description: string, date: Date, location: string, name: string) {
+function generateGoogleCalendarURL(
+    description: string,
+    date: Date,
+    location: string,
+    name: string
+) {
     // Format the date as required by Google Calendar (YYYYMMDDTHHmmssZ)
     const formattedDate = new Date(date)
         .toISOString()
@@ -83,7 +88,7 @@ export default function EventCard(props: { eventInfo: Event }) {
                             }}
                         >
                             (Cuisine:{" "}
-                            {toTitleCase(props.eventInfo.food.cuisine.replaceAll('"', ""))})
+                            {toTitleCase(props.eventInfo.food!.cuisine.replaceAll('"', ""))})
                         </Typography>
                     </Typography>
 
@@ -107,14 +112,14 @@ export default function EventCard(props: { eventInfo: Event }) {
                             <div className="-mb-4">
                                 <Rating
                                     name="simple-controlled"
-                                    value={props.eventInfo.food.rating / 2}
+                                    value={props.eventInfo.food!.rating / 2}
                                     precision={0.5}
                                     readOnly
                                 />
 
                                 <div className="mb-2">
                                     <Typography>
-                                        {truncateString(props.eventInfo.food.description, 240)}
+                                        {truncateString(props.eventInfo.description, 240)}
                                     </Typography>
                                 </div>
 
@@ -128,7 +133,7 @@ export default function EventCard(props: { eventInfo: Event }) {
                                 <div className="flex-col absolute -bottom-1 left-1 justify-items-left justify-left gap-2">
                                     <a
                                         href={generateGoogleCalendarURL(
-                                            props.eventInfo.food.description,
+                                            props.eventInfo.description,
                                             props.eventInfo.date,
                                             props.eventInfo.location.address,
                                             props.eventInfo.name + " (Free food!)"
@@ -146,7 +151,7 @@ export default function EventCard(props: { eventInfo: Event }) {
                                     </a>
 
                                     <div className="flex justify-between justify-items-left justify-left gap-2">
-                                        {(props.eventInfo.volunteer as any as string) && (
+                                        {(props.eventInfo.food!.volunteer as any as string) && (
                                             <Chip
                                                 label="Volunteer"
                                                 variant="outlined"

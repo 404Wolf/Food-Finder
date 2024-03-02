@@ -1,28 +1,18 @@
 "use client";
 
 import React, { useState, useEffect, useMemo, useRef, useCallback } from "react";
-import { FoodEvent } from "@/models/Event";
+import { Event } from "@/models/Event";
 import Events from "./Events";
-import Checkbox from "@mui/material/Checkbox";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import {
-    AppBar,
     Autocomplete,
-    Box,
     Divider,
-    Drawer,
-    Grid,
-    List,
-    Paper,
     Skeleton,
     Stack,
     Switch,
     TextField,
-    Toolbar,
     Typography,
-    paperClasses,
 } from "@mui/material";
-import { toTitleCase } from "@/utils/misc";
 import { Container } from "@mui/material";
 
 interface InputStatus {
@@ -32,88 +22,48 @@ interface InputStatus {
     cuisines?: string[];
 }
 
-function filterEvents(
-    events: FoodEvent[],
-    onCampusOnly: boolean,
-    excludeVolunteer: boolean,
-    pizzaOnly: boolean,
-    allowedCuisines: string[] = []
-) {
-    let eventsFiltered = events;
-
-    if (onCampusOnly) {
-        eventsFiltered = eventsFiltered.filter((event) => event.food.onCampus);
-    }
-
-    if (excludeVolunteer) {
-        eventsFiltered = eventsFiltered.filter((event) => !event.food.volunteer);
-    }
-
-    if (pizzaOnly) {
-        eventsFiltered = eventsFiltered.filter(
-            (event) =>
-                event.food.cuisine.toLowerCase().includes("pizza") ||
-                event.food.description.toLowerCase().includes("pizza")
-        );
-    }
-
-    if (allowedCuisines.length > 0) {
-        eventsFiltered = eventsFiltered.filter((event) => {
-            return allowedCuisines.includes(event.food.cuisine);
-        });
-    }
-
-    return eventsFiltered;
-}
-
-function sortEvents(events: FoodEvent[]) {
+function sortEvents(events: Event[]) {
     return events.sort((a, b) => {
         return a.date < b.date ? -1 : 1;
     });
 }
 
 export function EventsArea() {
-    const [events, setEvents] = useState<FoodEvent[]>([]);
     const [inputStatus, setInputStatus] = useState<InputStatus>({
         onCampusOnly: false,
         excludeVolunteer: false,
         pizzaOnly: false,
     });
-    const [cuisines, setCuisines] = useState<string[]>([]);
 
+    const [cuisines, setCuisines] = useState<string[]>([]);
     useEffect(() => {
-        fetch("/api/events")
-            .then((res) => res.json())
-            .then((data) => {
-                if (events.length === 0) {
-                    setEvents(data.data);
-                }
-                setCuisines(
-                    Array.from(
-                        new Set(
-                            data.data.map((event: FoodEvent) => {
-                                return event.food.cuisine;
-                            })
-                        )
-                    )
-                );
-            });
+        fetch("/api/events/cuisines")
+            .then((resp) => resp.json())
+            .then((data) => setCuisines(data.data));
     }, []);
 
-    const shownEvents = useMemo(() => {
-        console.log(inputStatus);
-        return sortEvents(
-            filterEvents(
-                events.filter((eventInfo: FoodEvent) => {
-                    return eventInfo !== undefined;
-                }) as FoodEvent[],
-                inputStatus.onCampusOnly,
-                inputStatus.excludeVolunteer,
-                inputStatus.pizzaOnly,
-                inputStatus.cuisines
-            )
-        );
-    }, [events, inputStatus]);
+    const [events, setEvents] = useState<Event[]>([]);
+    useEffect(() => {
+        const filters = new URLSearchParams();
+        if (inputStatus.onCampusOnly) {
+            filters.set("inPersonOnly", "true");
+        }
+        if (inputStatus.excludeVolunteer) {
+            filters.set("noVolunteer", "true");
+        }
+        if (inputStatus.pizzaOnly) {
+            filters.set("pizzaOnly", "true");
+        }
+        if (inputStatus.cuisines) {
+            filters.set("cuisines", inputStatus.cuisines.join(","));
+        }
+
+        fetch(`/api/events?${filters.toString()}`)
+            .then((resp) => resp.json())
+            .then((data) => {
+                setEvents(data.data);
+            });
+    }, [inputStatus]);
 
     return (
         <div className="relative mt-24 mb-[400px]">
@@ -202,9 +152,10 @@ export function EventsArea() {
             </Container>
 
             <Container maxWidth="lg">
-                {shownEvents.length > 1 ? (
+                {events.length > 1 ? (
                     <div className="-mt-4 sm:mt-0">
-                    <Events events={shownEvents} /></div>
+                        <Events events={events} />
+                    </div>
                 ) : (
                     <Skeleton variant="rectangular" width="100%" height="100%" />
                 )}

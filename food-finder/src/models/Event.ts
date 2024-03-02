@@ -19,14 +19,14 @@ export interface IcalEvent extends fetchedAt {
 // Food represents a parsed response from the AI, evaluating the quality of food provided at the event
 export interface FoodInfo extends fetchedAt {
     rating: number; // 1-10
-    description: string; // "cheap snacks" or "fully prepared feast"
     cuisine: string; // "Italian" or "Mexican"
+    volunteer: boolean; // true or false
 }
 
 // Event represents a pair of Event and Food, for spending to the front end
 export interface Event extends IcalEvent {
-    food: FoodInfo; // A Food object
+    food?: FoodInfo; // A Food object
     onCampus: boolean; // true or false
-    volunteer: boolean; // true or false
     fetchedAt: Date; // "2021-04-20T12:00:00Z"
+    description: string; // "cheap snacks" or "fully prepared feast"
 }

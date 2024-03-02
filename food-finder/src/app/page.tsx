@@ -1,10 +1,23 @@
-import Image from "next/image";
-import EventCard from "../components/EventCard";
 import { EventsArea } from "@/components/EventsArea";
-import { Container } from "@mui/material";
 import Appbar from "@/components/Appbar";
 
 export default async function Home() {
+    /*
+    async function getEvents() {
+        "use server";
+        const res = await fetch("http://localhost:3000/api/events");
+        const data = await res.json();
+        return data.data;
+    }
+
+    async function getCuisines() {
+        "use server";
+        const res = await fetch("http://localhost:3000/api/events/cuisines");
+        const data = await res.json();
+        return data.data;
+    }
+    */
+
     return (
         <>
             <Appbar />

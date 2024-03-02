@@ -1,22 +1,24 @@
-import { FoodEvent } from "@/models/Event";
-import { mongoConnect } from "@/utils/mongoConnect";
+import { getAllEvents } from "@/utils/getAllEvents";
 
-export const GET = async (): Promise<Response> => {
-    const { db, client } = await mongoConnect();
-    const collection = db.collection("events");
-    const temp: any = await collection.find({}).toArray();
-    console.log(temp);
-    
-    let events = temp as FoodEvent[];
-    events = events
-        .filter((event) => event !== undefined)
-        .filter((event) => {
-            return event.food.rating > 0 
-            // && event.date > new Date();
-        });
-    client.close();
-    events = events.sort((a, b) => a.date.getTime() - b.date.getTime());
-    events = events.filter((event) => event.date > new Date());
+export const GET = async (request: Request): Promise<Response> => {
+    const params = new URL(request.url).searchParams;
 
-    return Response.json({ success: true, data: events });
+    const filters: any = {};
+    if (params.get("inPersonOnly") === "true") {
+        filters.inPersonOnly = true;
+    }
+    if (params.get("noVolunteer") === "true") {
+        filters.noVolunteer = true;
+    }
+    if (params.get("pizzaOnly") === "true") {
+        filters.pizzaOnly = true;
+    }
+    if (params.get("cuisines")) {
+        filters.cuisines = params.get("cuisines")?.split(",");
+    }
+
+    return Response.json({
+        success: true,
+        data: await getAllEvents(filters),
+    });
 };
