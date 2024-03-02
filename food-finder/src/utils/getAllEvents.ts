@@ -44,7 +44,6 @@ export async function getAllEvents(filters: EventFilters = {}) {
     } else if (filters.cuisines) {
         query["food.cuisine"] = { $in: filters.cuisines.map(toTitleCase) };
     }
-    console.log(query)
 
     // Fetch all events from the database and only include events that haven't happened yet;
     // and events that are food rating > 0
