@@ -23,6 +23,8 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
+            <script src="https://unpkg.com/react@16.0.0/umd/react.production.min.js"></script>
+            <script src="https://unpkg.com/react-copy-to-clipboard/build/react-copy-to-clipboard.js"></script>
             <link rel="icon" href="/favicon.ico" sizes="any" />
 
             <ThemeProvider theme={theme}>

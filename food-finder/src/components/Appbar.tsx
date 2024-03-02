@@ -1,6 +1,7 @@
 import React from "react";
 import { AppBar, Toolbar, Typography, Container, Box } from "@mui/material";
 import Image from "next/image";
+import IcalButton from "./IcalButton";
 
 const App = () => {
     return (
@@ -28,7 +29,7 @@ const App = () => {
                                     minHeight: "20px",
                                     marginTop: { xs: "0px", md: "2px" },
                                     marginBottom: { xs: "0px", md: "2px" },
-                                    fontSize: { xs: "1.2rem", md: "3rem"},
+                                    fontSize: { xs: "1.2rem", md: "3rem" },
                                 }}
                                 fontFamily='-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol"'
                             >
@@ -36,6 +37,10 @@ const App = () => {
                             </Typography>
                         </Container>
                     </Toolbar>
+
+                    <div className="scale-[200%] fixed top-4 right-8">
+                        <IcalButton />
+                    </div>
 
                     <a
                         href="https://github.com/404Wolf/Food-Finder"
