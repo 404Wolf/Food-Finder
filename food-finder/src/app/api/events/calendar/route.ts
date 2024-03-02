@@ -17,7 +17,7 @@ export async function GET() {
             summary: event.name,
             description: event.description,
             location: `${event.location.name} - ${event.location.address}`,
-            url: `https://community.case.edu/brewcwru/rsvp_boot?id=${event._id}`,
+            url: `https://community.case.edu/rsvp?id=${event._id}`,
         });
     }
 

@@ -27,11 +27,13 @@ export async function getAllEvents(filters: EventFilters = {}) {
         query.date = { $gte: filters.afterDate };
     }
     if (filters.minRating) {
-        query.foodRating = { $gte: filters.minRating };
+        query["food.rating"] = { $gte: filters.minRating };
     }
-
     if (filters.noVolunteer) {
         query.volunteer = { $exists: false };
+    }
+    if (filters.inPersonOnly) {
+        query.inPersonOnly = false;
     }
     if (filters.pizzaOnly) {
         if (filters.cuisines) {

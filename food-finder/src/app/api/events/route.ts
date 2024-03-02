@@ -1,4 +1,4 @@
-import { getAllEvents } from "@/utils/getAllEvents";
+import { EventFilters, getAllEvents } from "@/utils/getAllEvents";
 
 export const GET = async (request: Request): Promise<Response> => {
     const params = new URL(request.url).searchParams;
@@ -16,9 +16,12 @@ export const GET = async (request: Request): Promise<Response> => {
     if (params.get("cuisines")) {
         filters.cuisines = params.get("cuisines")?.split(",");
     }
-
+    if (params.get("minRating")) {
+        filters.minRating = parseInt(params.get("minRating")!);
+    }
+    console.log(await getAllEvents(filters as EventFilters));
     return Response.json({
         success: true,
-        data: await getAllEvents(filters),
+        data: await getAllEvents(filters as EventFilters),
     });
 };
