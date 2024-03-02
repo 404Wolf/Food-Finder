@@ -9,6 +9,6 @@ export async function mongoConnect() {
 
     const client = new MongoClient(uri);
     await client.connect();
-    const database = client.db("freefood-test");
+    const database = client.db("freefood");
     return {db: database, client: client};
 }
