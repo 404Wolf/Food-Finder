@@ -57,6 +57,7 @@ export function EventsArea() {
         if (inputStatus.cuisines) {
             filters.set("cuisines", inputStatus.cuisines.join(","));
         }
+        filters.set("minRating", "1");
 
         fetch(`/api/events?${filters.toString()}`)
             .then((resp) => resp.json())
