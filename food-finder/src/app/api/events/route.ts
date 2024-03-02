@@ -19,7 +19,7 @@ export const GET = async (request: Request): Promise<Response> => {
     if (params.get("minRating")) {
         filters.minRating = parseInt(params.get("minRating")!);
     }
-    console.log(await getAllEvents(filters as EventFilters));
+    
     return Response.json({
         success: true,
         data: await getAllEvents(filters as EventFilters),
