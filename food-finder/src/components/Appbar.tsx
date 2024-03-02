@@ -38,7 +38,7 @@ const App = () => {
                         </Container>
                     </Toolbar>
 
-                    <div className="scale-[200%] fixed top-4 right-8">
+                    <div className="scale-125 sm:scale-[200%] fixed top-3 sm:top-4 right-4 sm:right-8">
                         <IcalButton />
                     </div>
 
