@@ -1,8 +1,9 @@
 import { getAllEvents } from "@/utils/getAllEvents";
+import { parseEventFilters } from "@/utils/parseEventFilters";
 import ical, { ICalCalendarMethod } from "ical-generator";
 
-export async function GET() {
-    const events = await getAllEvents();
+export async function GET(request: Request) {
+    const events = await getAllEvents({ minRating: 1, ...parseEventFilters(request.url) });
 
     const calendar = ical({ name: "Free CWRU Food", description: "Free food events at CWRU" });
 
