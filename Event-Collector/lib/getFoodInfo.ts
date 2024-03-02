@@ -16,7 +16,7 @@ export const analyzer = {
                     
                     Make sure that if there is food mentioned in the description that the rating is not a 0.
                     
-                    IF THERE IS ANY MENTION OF FOOD DO NOT RATE THE EVENT 0.`,
+                    IF THERE IS ANY MENTION OF FOOD DO NOT RATE THE EVENT 0. NEVER MENTION 0 IF THERE IS A MENTION OF FOOD IN THE DESCRIPTION. IF THERE IS A MENTION OF FOOD IN THE DESCRIPTION DO NOT PUT 0 FOR THE RATING.`,
                 },
                 { role: "user", content: description },
             ],
