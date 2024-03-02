@@ -30,20 +30,21 @@ export async function getAllEvents(filters: EventFilters = {}) {
         query["food.rating"] = { $gte: filters.minRating };
     }
     if (filters.noVolunteer) {
-        query.volunteer = { $exists: false };
+        query["food.volunteer"] = false;
     }
     if (filters.inPersonOnly) {
-        query.inPersonOnly = false;
+        query.onCampus = false;
     }
     if (filters.pizzaOnly) {
         if (filters.cuisines) {
-            query.cuisine = { $in: [...filters.cuisines.map(toTitleCase), "Pizza"] };
+            query["food.cuisine"] = { $in: [...filters.cuisines.map(toTitleCase), "Pizza"] };
         } else {
-            query.cuisine = "Pizza";
+            query["food.cuisine"] = "Pizza";
         }
     } else if (filters.cuisines) {
-        query.cuisine = { $in: filters.cuisines.map(toTitleCase) };
+        query["food.cuisine"] = { $in: filters.cuisines.map(toTitleCase) };
     }
+    console.log(query)
 
     // Fetch all events from the database and only include events that haven't happened yet;
     // and events that are food rating > 0

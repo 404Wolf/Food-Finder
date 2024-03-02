@@ -80,7 +80,7 @@ export function EventsArea() {
 
                     <Stack direction="row">
                         <div>
-                            <Stack>
+                            <Stack gap="5px">
                                 <Typography variant="h6">General Filters</Typography>
                                 <FormControlLabel
                                     control={
