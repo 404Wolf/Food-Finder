@@ -48,6 +48,8 @@ export async function getAllEvents(filters: EventFilters = {}) {
     // Fetch all events from the database and only include events that haven't happened yet;
     // and events that are food rating > 0
     const events = await collection.find(query).toArray();
+    events.sort((a, b) => (a.date < b.date ? -1 : 1));
+    
     client.close();
 
     return events;

@@ -19,6 +19,9 @@ export function parseEventFilters(queryString: string): EventFilters {
     if (params.get("minRating")) {
         filters.minRating = parseInt(params.get("minRating")!);
     }
+    if (params.get("afterDate")) {
+        filters.afterDate = new Date(params.get("afterDate")!);
+    }
 
     return filters;
 }

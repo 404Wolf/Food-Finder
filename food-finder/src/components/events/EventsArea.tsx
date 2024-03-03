@@ -14,6 +14,7 @@ import {
     Typography,
 } from "@mui/material";
 import { Container } from "@mui/material";
+import BlankEventCard from "../BlankEventCard";
 
 interface InputStatus {
     onCampusOnly: boolean;
@@ -22,11 +23,7 @@ interface InputStatus {
     cuisines?: string[];
 }
 
-function sortEvents(events: Event[]) {
-    return events.sort((a, b) => {
-        return a.date < b.date ? -1 : 1;
-    });
-}
+const LOADING_SKELETON_COUNT = 20;
 
 export function EventsArea() {
     const [inputStatus, setInputStatus] = useState<InputStatus>({
@@ -58,6 +55,7 @@ export function EventsArea() {
             filters.set("cuisines", inputStatus.cuisines.join(","));
         }
         filters.set("minRating", "1");
+        filters.set("afterDate", new Date().toISOString());
 
         fetch(`/api/events?${filters.toString()}`)
             .then((resp) => resp.json())
@@ -153,13 +151,9 @@ export function EventsArea() {
             </Container>
 
             <Container maxWidth="lg">
-                {events.length > 1 ? (
-                    <div className="-mt-4 sm:mt-0">
-                        <Events events={events} />
-                    </div>
-                ) : (
-                    <Skeleton variant="rectangular" width="100%" height="100%" />
-                )}
+                <div className="-mt-4 sm:mt-0">
+                    {events.length > 1 ? <Events events={events} /> : <Events />}
+                </div>
             </Container>
         </div>
     );

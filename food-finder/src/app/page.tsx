@@ -1,4 +1,4 @@
-import { EventsArea } from "@/components/EventsArea";
+import { EventsArea } from "@/components/events/EventsArea";
 import Appbar from "@/components/Appbar";
 
 export default async function Home() {

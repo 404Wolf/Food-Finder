@@ -1,12 +1,9 @@
-"use client";
-
-import React, { useState } from "react";
-import { Card, CardContent, Typography, CardMedia, Rating, Chip } from "@mui/material";
+import { Card, CardContent, Typography, CardMedia, Rating, Chip, Tooltip } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { Event } from "@/models/Event";
 import { toTitleCase } from "@/utils/misc";
 
-const StyledCard = styled(Card)(({ theme }) => ({
+export const StyledEventCard = styled(Card)(({ theme }) => ({
     height: "100%",
     width: "100%",
     borderRadius: "10px",
@@ -44,7 +41,6 @@ function generateGoogleCalendarURL(
 
     // End one hour later
     const endDate = new Date(date);
-    endDate.setHours(endDate.getHours() + 1);
     const formattedEndDate = endDate
         .toISOString()
         .replace(/[:-]/g, "")
@@ -76,7 +72,7 @@ export default function EventCard(props: { eventInfo: Event }) {
 
     return (
         <div className="flex justify-stretch justify-items-center relative h-full mb-8">
-            <StyledCard className="flex-row h-[12rem] pb-[10px]">
+            <StyledEventCard className="flex-row h-[12rem] pb-[10px]">
                 <div className="relative h-full p-2">
                     <Typography variant="h6" className="text-center rounded-lg">
                         {truncateString(props.eventInfo.name, 50)}
@@ -110,19 +106,32 @@ export default function EventCard(props: { eventInfo: Event }) {
                             </div>
 
                             <div className="-mb-4">
-                                <Rating
-                                    name="simple-controlled"
-                                    value={props.eventInfo.food!.rating / 2}
-                                    precision={0.5}
-                                    readOnly
-                                />
+                                <Tooltip
+                                    title="AI generated rating based on quality and likeliness of the free food provided, based on event description analysis"
+                                    arrow
+                                    placement="top-start"
+                                >
+                                    <div>
+                                        <Rating
+                                            name="simple-controlled"
+                                            value={props.eventInfo.food!.rating / 2}
+                                            precision={0.5}
+                                            readOnly
+                                        />
+                                    </div>
+                                </Tooltip>
 
-                                <div className="mb-2">
-                                    <Typography>
-                                        {truncateString(props.eventInfo.description, 240)}
-                                    </Typography>
-                                </div>
-
+                                <Tooltip
+                                    title="Click to view event on CampusGroups"
+                                    placement="bottom-start"
+                                    arrow
+                                >
+                                    <div className="mb-2">
+                                        <Typography>
+                                            {truncateString(props.eventInfo.description, 240)}
+                                        </Typography>
+                                    </div>
+                                </Tooltip>
                                 <p
                                     style={{ lineHeight: "-1rem", fontSize: "11px" }}
                                     className="absolute right-2 -bottom-1 max-w-[30%]"
@@ -131,24 +140,30 @@ export default function EventCard(props: { eventInfo: Event }) {
                                 </p>
 
                                 <div className="flex-col absolute -bottom-1 left-1 justify-items-left justify-left gap-2">
-                                    <a
-                                        href={generateGoogleCalendarURL(
-                                            props.eventInfo.description,
-                                            props.eventInfo.date,
-                                            props.eventInfo.location.address,
-                                            props.eventInfo.name + " (Free food!)"
-                                        )}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
+                                    <Tooltip
+                                        title="Click to add to Google calendar"
+                                        arrow
+                                        placement="top-start"
                                     >
-                                        <div className="pb-1">
-                                            <Chip
-                                                label={niceDate}
-                                                variant="outlined"
-                                                size="small"
-                                            />
-                                        </div>
-                                    </a>
+                                        <a
+                                            href={generateGoogleCalendarURL(
+                                                props.eventInfo.description,
+                                                props.eventInfo.date,
+                                                props.eventInfo.location.address,
+                                                props.eventInfo.name + " (Free food!)"
+                                            )}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                        >
+                                            <div className="pb-1">
+                                                <Chip
+                                                    label={niceDate}
+                                                    variant="outlined"
+                                                    size="small"
+                                                />
+                                            </div>
+                                        </a>
+                                    </Tooltip>
 
                                     <div className="flex justify-between justify-items-left justify-left gap-2">
                                         {(props.eventInfo.food!.volunteer as any as string) && (
@@ -176,7 +191,7 @@ export default function EventCard(props: { eventInfo: Event }) {
                         </CardContent>
                     </a>
                 </div>
-            </StyledCard>
+            </StyledEventCard>
         </div>
     );
 }
