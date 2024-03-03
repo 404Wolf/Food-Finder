@@ -1,11 +1,10 @@
-import {
-    CardContent,
-    Skeleton,
-    Stack,
-} from "@mui/material";
+import { CardContent, Skeleton, Stack } from "@mui/material";
 import { StyledEventCard } from "./events/EventCard";
+import { useMemo } from "react";
 
 export default function BlankEventCard() {
+    const tagCount = useMemo(() => Math.floor(Math.random() * 3) + 1, []);
+
     return (
         <div className="flex justify-stretch justify-items-center relative h-full mb-8">
             <StyledEventCard className="flex-row h-[12rem] pb-[10px]">
@@ -39,7 +38,7 @@ export default function BlankEventCard() {
                             <div className="flex-col absolute bottom-3 left-2 justify-items-left justify-left gap-2">
                                 <div className="flex justify-between justify-items-left justify-left gap-2">
                                     {Array.from({
-                                        length: Math.floor(Math.random() * 3) + 1,
+                                        length: tagCount,
                                     }).map((_, index) => (
                                         <Skeleton
                                             key={index}
