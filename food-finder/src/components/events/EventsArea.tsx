@@ -4,17 +4,8 @@ import React, { useState, useEffect, useMemo, useRef, useCallback } from "react"
 import { Event } from "@/models/Event";
 import Events from "./Events";
 import FormControlLabel from "@mui/material/FormControlLabel";
-import {
-    Autocomplete,
-    Divider,
-    Skeleton,
-    Stack,
-    Switch,
-    TextField,
-    Typography,
-} from "@mui/material";
+import { Autocomplete, Divider, Stack, Switch, TextField, Typography } from "@mui/material";
 import { Container } from "@mui/material";
-import BlankEventCard from "../BlankEventCard";
 
 interface InputStatus {
     onCampusOnly: boolean;
@@ -26,6 +17,8 @@ interface InputStatus {
 const LOADING_SKELETON_COUNT = 20;
 
 export function EventsArea() {
+    const [ready, setReady] = useState(false);
+
     const [inputStatus, setInputStatus] = useState<InputStatus>({
         onCampusOnly: false,
         excludeVolunteer: false,
@@ -61,6 +54,7 @@ export function EventsArea() {
             .then((resp) => resp.json())
             .then((data) => {
                 setEvents(data.data);
+                setReady(true);
             });
     }, [inputStatus]);
 
@@ -152,7 +146,7 @@ export function EventsArea() {
 
             <Container maxWidth="lg">
                 <div className="-mt-4 sm:mt-0">
-                    {events.length > 1 ? <Events events={events} /> : <Events />}
+                    {ready ? <Events events={events} /> : <Events />}
                 </div>
             </Container>
         </div>

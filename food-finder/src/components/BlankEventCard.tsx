@@ -1,66 +1,58 @@
 import {
-    Card,
     CardContent,
-    Typography,
-    CardMedia,
-    Rating,
-    Chip,
-    Tooltip,
     Skeleton,
+    Stack,
 } from "@mui/material";
-import { styled } from "@mui/material/styles";
-import { Event } from "@/models/Event";
-import { toTitleCase } from "@/utils/misc";
 import { StyledEventCard } from "./events/EventCard";
 
-export default function BlankEventCard(props: { eventInfo: Event }) {
+export default function BlankEventCard() {
     return (
         <div className="flex justify-stretch justify-items-center relative h-full mb-8">
             <StyledEventCard className="flex-row h-[12rem] pb-[10px]">
                 <div className="relative h-full p-2">
                     <Skeleton
-                        animation="wave"
                         height={50}
                         width="90%"
-                        style={{ marginBottom: 5, marginLeft: 15 }}
+                        style={{ marginBottom: 5, marginLeft: 15, borderRadius: 10 }}
                     />
 
                     <div className="mt-1"></div>
 
                     <CardContent>
-                        <div className="float-right ml-1">
+                        <Stack spacing={2} direction="row">
                             <Skeleton
                                 variant="rectangular"
-                                width={140}
-                                height={100}
-                                style={{ marginBottom: 6, borderRadius: 10, marginRight: 6 }}
+                                width="60%"
+                                height={110}
+                                sx={{ borderRadius: 4 }}
+                                style={{ marginBottom: 6, marginRight: 6 }}
                             />
-                        </div>
 
-                        <div className="-mb-4">
                             <Skeleton
-                                animation="wave"
-                                height={40}
-                                width="80%"
-                                style={{ marginBottom: 6 }}
+                                variant="rectangular"
+                                width="40%"
+                                height={110}
+                                sx={{ borderRadius: 4 }}
+                                style={{ marginBottom: 6, marginRight: 6 }}
                             />
 
-                            <div className="flex-col absolute -bottom-1 left-1 justify-items-left justify-left gap-2">
+                            <div className="flex-col absolute bottom-3 left-2 justify-items-left justify-left gap-2">
                                 <div className="flex justify-between justify-items-left justify-left gap-2">
-                                    <Chip
-                                        label="&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;"
-                                        size="small"
-                                    />
-
-                                    <Chip
-                                        label="&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;"
-                                        size="small"
-                                    />
-
+                                    {Array.from({
+                                        length: Math.floor(Math.random() * 3) + 1,
+                                    }).map((_, index) => (
+                                        <Skeleton
+                                            key={index}
+                                            variant="rectangular"
+                                            sx={{ borderRadius: 10 }}
+                                            width={80}
+                                            height={24}
+                                        />
+                                    ))}
                                     <div className="grow"></div>
                                 </div>
                             </div>
-                        </div>
+                        </Stack>
                     </CardContent>
                 </div>
             </StyledEventCard>
