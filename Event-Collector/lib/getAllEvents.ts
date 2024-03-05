@@ -25,7 +25,7 @@ export async function getEventIds() {
 
         // If the event has already passed, don't bother analyzing it
         if (event.start < new Date()) {
-            console.debug(`Skipping event ${event.location} because it has already passed`);
+            console.debug(`Skipping event because it has already passed`);
             continue;
         }
 
@@ -74,7 +74,6 @@ export async function getAndStoreAllEvents() {
     const dbMetadata = await db.collection("metadata");
     const authHeaders = await getAuthHeaders(CASE_ID, CASE_PASSWORD);
     const existingEventIds = await getExistingEvents();
-    
 
     const eventIds = await getEventIds();
 
@@ -82,7 +81,7 @@ export async function getAndStoreAllEvents() {
 
     async function getAndUploadEvent(id: string) {
         if (existingEventIds.has(id)) {
-            console.debug(`Skipping event ${id} because it has already been fetched`);
+            console.debug(`Skipping event because it has already been fetched`);
             return;
         }
 
@@ -100,7 +99,7 @@ export async function getAndStoreAllEvents() {
 
         // If the event has already passed, don't bother analyzing it
         if (eventPageInfo.date < new Date()) {
-            console.debug(`Skipping event ${id} because it has already passed`);
+            console.debug(`Skipping event because it has already passed`);
             return;
         }
 
@@ -130,18 +129,11 @@ export async function getAndStoreAllEvents() {
         uploadEvent(foodEvent);
     }
 
-    const timeout = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
-    const withTimeout = async (promise, timeoutMs) => {
-        return Promise.race([promise, timeout(timeoutMs)]);
-    };
-
     await Promise.all(
         eventIds.map((id) =>
-            withTimeout(
-                limit(async () => await getAndUploadEvent(id)),
-                60000
-            )
+            limit(async () => {
+                await getAndUploadEvent(id);
+            })
         )
     );
 
@@ -150,4 +142,7 @@ export async function getAndStoreAllEvents() {
         { $set: { date: new Date() } },
         { upsert: true }
     );
+
+    // Close the database connection when all events have been fetched and stored
+    await client.close();
 }

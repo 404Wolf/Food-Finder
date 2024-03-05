@@ -17,7 +17,17 @@ export interface PuppeteerEvent {
     description: string;
 }
 
-const URL = "https://community.case.edu/brewcwru/rsvp_boot?id=2254804";
+const URL = "https://community.case.edu/rsvp_boot?id=2254804";
+
+function cleanJsonString(inputString: string): string {
+    // Define a regular expression pattern to match valid JSON characters
+    const validJsonPattern: RegExp = /[^a-zA-Z0-9_:"',\{\}\[\]\.\- ]/g;
+
+    // Remove any characters that do not match the pattern
+    const cleanedString: string = inputString.replace(validJsonPattern, "");
+
+    return cleanedString;
+}
 
 export async function getAuthHeaders(caseId: string, casePassword: string) {
     const browser = await puppeteer.launch({
@@ -46,23 +56,29 @@ export async function getAuthHeaders(caseId: string, casePassword: string) {
 }
 
 export async function getEventInfo(eventId: string, headers): Promise<PuppeteerEvent | null> {
-    const eventText = await fetch(`https://community.case.edu/brewcwru/rsvp_boot?id=${eventId}`, {
-        headers: headers,
-        body: null,
-        method: "GET",
-    }).then((response) => response.text());
+    const fetchEvent = async () =>
+        fetch(`https://community.case.edu/rsvp_boot?id=${eventId}`, {
+            headers: headers,
+            body: null,
+            method: "GET",
+        }).then((response) => response.text());
 
-    const dom = new JSDOM(eventText);
-    const element = dom.window.document.querySelector("#page-cont > script:nth-child(4)");
+    let eventText = await fetchEvent();
+    for (const _ of Array(2).keys()) {
+        const dom = new JSDOM(eventText);
+        const element = dom.window.document.querySelector("#page-cont > script:nth-child(4)");
 
-    // In the event we could not fetch the element, ignore this event
-    try {
-        const data = JSON.parse(element.innerHTML);
-        data.description = he.decode(data.description);
-        console.debug(`Fetched event id ${eventId}`);
-        return data;
-    } catch {
-        console.debug(`Failed to fetch and parse event id ${eventId}`);
-        return null;
+        if (element) {
+            const innerHTML = cleanJsonString(he.decode(element.innerHTML));
+            const data = JSON.parse(innerHTML);
+            data.description = he.decode(data.description);
+            console.debug(`Fetched event id ${eventId}`);
+            return data;
+        }
     }
+    console.debug(`Failed to fetch event id ${eventId}, retrying`);
+    eventText = await fetchEvent();
+
+    console.error(`Failed to fetch event id ${eventId}`);
+    return null;
 }
